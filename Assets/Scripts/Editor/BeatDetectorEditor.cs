@@ -41,7 +41,7 @@ namespace Lasp.Editor
                     Vector3 p0 = new Vector3(x, rect.yMax, 0);
                     Vector3 p1 = new Vector3(x, rect.yMin, 0);
 
-                    Handles.color = Color.green;
+                    Handles.color = Color.gray;
                     Handles.DrawLine(p0, p1);
                 }
             }
@@ -57,18 +57,19 @@ namespace Lasp.Editor
                     Vector3 p0 = new Vector3(x, rect.yMax, 0);
                     Vector3 p1 = new Vector3(x, rect.yMin, 0);
 
-                    Handles.color = Color.red;
+                    Handles.color = Color.green;
                     Handles.DrawLine(p0, p1);
                 }
 
             }
 
             float maxVal = data.Max();
+            float minVal = data.Min();
             // Spectrum curve construction
             for (var i = 0; i < data.Length; i++)
             {
                 var x = (float)i / data.Length;
-                var y = data[i * data.Length / data.Length] / maxVal;
+                var y = (data[i * data.Length / data.Length] - minVal) / (maxVal - minVal);
 
                 x = x * rect.width + rect.xMin;
                 y = rect.yMax - y * rect.height;
@@ -90,10 +91,24 @@ namespace Lasp.Editor
             if (EditorApplication.isPlaying)
             {
                 DrawGraph(targetComponent.m_currentLevels);
-                DrawGraph(targetComponent.m_weights, new float[3] {
-                    targetComponent.CurrentOffset ,
-                    targetComponent.CurrentOffset* 2f,
-                    targetComponent.CurrentOffset/2f }, new float[1] { targetComponent.CurrentOffsetLagrange });
+                GUILayout.Label("Beats");
+                DrawGraph(targetComponent.BeatHistory);
+                GUILayout.Label("BPM");
+                DrawGraph(targetComponent.LFOHistory);
+                GUILayout.Label("LFO");
+                DrawGraph(targetComponent.m_fftMagAvg);
+                GUILayout.Label("autocorrelation");
+                DrawGraph(targetComponent.m_weights, targetComponent.currentPeaks,
+
+                    new float[3] {
+                        targetComponent.currentPeaks[0] ,
+                        targetComponent.currentPeaks[0]* 2f,
+                        targetComponent.currentPeaks[0]* 3f
+                    }
+                    );
+                GUILayout.Label("bpmHistogram");
+
+                DrawGraph(targetComponent.m_bpmHistogram, new float[1] { targetComponent.BPM });
 
             }
 
