@@ -39,7 +39,7 @@ namespace Lasp.Editor
                     x = x * rect.width + rect.xMin;
 
                     Vector3 p0 = new Vector3(x, rect.yMax, 0);
-                    Vector3 p1 = new Vector3(x, rect.yMin, 0);
+                    Vector3 p1 = new Vector3(x, rect.yMin + rect.height / 2, 0);
 
                     Handles.color = Color.gray;
                     Handles.DrawLine(p0, p1);
@@ -54,7 +54,7 @@ namespace Lasp.Editor
 
                     x = x * rect.width + rect.xMin;
 
-                    Vector3 p0 = new Vector3(x, rect.yMax, 0);
+                    Vector3 p0 = new Vector3(x, rect.yMax - rect.height/2, 0);
                     Vector3 p1 = new Vector3(x, rect.yMin, 0);
 
                     Handles.color = Color.green;
@@ -79,7 +79,7 @@ namespace Lasp.Editor
 
             // Curve
             Handles.color = Color.white;
-            Handles.DrawAAPolyLine(3f, data.Length, _vertices);
+            Handles.DrawAAPolyLine(2f, data.Length, _vertices);
         }
 
         public override void OnInspectorGUI()
@@ -91,25 +91,20 @@ namespace Lasp.Editor
             if (EditorApplication.isPlaying)
             {
                 DrawGraph(targetComponent.m_currentLevels);
-                GUILayout.Label("Beats");
-                DrawGraph(targetComponent.BeatHistory);
-                GUILayout.Label("BPM");
-                DrawGraph(targetComponent.LFOHistory);
-                GUILayout.Label("LFO");
-                DrawGraph(targetComponent.m_fftMagAvg);
-                GUILayout.Label("autocorrelation");
-                DrawGraph(targetComponent.m_weights, targetComponent.currentPeaks,
-
-                    new float[3] {
-                        targetComponent.currentPeaks[0] ,
-                        targetComponent.currentPeaks[0]* 2f,
-                        targetComponent.currentPeaks[0]* 3f
-                    }
-                    );
-                GUILayout.Label("bpmHistogram");
-
+                GUILayout.Label("RMS History");
+                GUILayout.Label("THE BEAT");
+                DrawGraph(targetComponent.BeatHistory, new float[1] { targetComponent.CorrOffset }, new float[1] { targetComponent.CorrOffset });
+                GUILayout.Label("THE BEAT");
+                DrawGraph(targetComponent.ReferenceBeats);
+                //GUILayout.Label("FFT");
+                // DrawGraph(targetComponent.m_fftMagAvg);
+                DrawGraph(targetComponent.m_weights, targetComponent.currentPeaks, targetComponent.harmonicPeaks);
+                GUILayout.Label($"Autocorrelation :\t {(int)targetComponent.fitFreq}\tsamples :  \t{(int)targetComponent.fitFreq* 50}\tms");
                 DrawGraph(targetComponent.m_bpmHistogram, new float[1] { targetComponent.BPM });
+                GUILayout.Label($"bpmHistogram: \tPeak{targetComponent.BPM}");
 
+                DrawGraph(targetComponent.LFOHistory);
+                GUILayout.Label("THE BEAT");
             }
 
             serializedObject.ApplyModifiedProperties();

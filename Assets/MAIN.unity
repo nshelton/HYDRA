@@ -2844,7 +2844,7 @@ MonoBehaviour:
     m_Name: TextureWidth
   _sampleCountProperty:
     m_Name: SampleCount
-  Target: {fileID: 1695259405}
+  Target: {fileID: 0}
 --- !u!114 &576505787
 MonoBehaviour:
   m_ObjectHideFlags: 2
@@ -5223,6 +5223,7 @@ GameObject:
   - component: {fileID: 1164400993}
   - component: {fileID: 1164400995}
   - component: {fileID: 1164400996}
+  - component: {fileID: 1164400997}
   m_Layer: 0
   m_Name: audio
   m_TagString: Untagged
@@ -5294,14 +5295,46 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e59854b9c2c15874788372ffe656540e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_level: {fileID: 1695259405}
-  m_bass: {fileID: 1480864648}
-  m_fftTexture: {fileID: 8400000, guid: 121dcd52a1e2ac74099fdacd9883562f, type: 2}
+  m_level: {fileID: 1164400997}
   m_correlationLerp: 0.99
+  m_bpmAttentionSpan: 0.999
   m_weights: []
   m_currentWeights: []
   m_currentLevels: []
   m_bpmHistogram: []
+  BPM: 0
+  BEAT: 0
+  rawFreq: 0
+  fitFreq: 1
+  fitFreqBPM: 0
+  harmonicThreshold: 1
+  offsetError: 1
+  CorrOffset: 0
+  ReferenceBeats: []
+--- !u!114 &1164400997
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1164400992}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 74c3e183ec27ba64d83e010bf18edb92, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _useDefaultDevice: 1
+  _deviceID: 
+  _channel: 0
+  _filterType: 0
+  _autoGain: 1
+  _gain: 6
+  _dynamicRange: 22.4
+  _smoothFall: 1
+  _fallSpeed: 1
+  _propertyBinders: []
+  references:
+    version: 1
 --- !u!1 &1190961988
 GameObject:
   m_ObjectHideFlags: 0
@@ -7721,7 +7754,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1695259406}
-  - component: {fileID: 1695259405}
   m_Layer: 0
   m_Name: Right Channel
   m_TagString: Untagged
@@ -7729,30 +7761,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1695259405
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1695259404}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 74c3e183ec27ba64d83e010bf18edb92, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _useDefaultDevice: 1
-  _deviceID: 
-  _channel: 1
-  _filterType: 0
-  _autoGain: 1
-  _gain: 6
-  _dynamicRange: 20
-  _smoothFall: 1
-  _fallSpeed: 0.3
-  _propertyBinders: []
-  references:
-    version: 1
 --- !u!4 &1695259406
 Transform:
   m_ObjectHideFlags: 0
@@ -9859,7 +9867,7 @@ MonoBehaviour:
     m_Name: TextureWidth
   _sampleCountProperty:
     m_Name: SampleCount
-  Target: {fileID: 1695259405}
+  Target: {fileID: 0}
 --- !u!1 &2096437974
 GameObject:
   m_ObjectHideFlags: 0

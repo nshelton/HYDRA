@@ -13,14 +13,14 @@ public class PostFXController : MonoBehaviour
 
     private void Start()
     {
-        var settings = m_volume.sharedProfile.settings;
+     /*   var settings = m_volume.sharedProfile.settings;
         foreach(var s in settings)
         {
             if ((Chroma)s != null)
                 m_chroma = (Chroma)s;
             if ((Mirror)s != null)
                 m_mirror = (Mirror)s;
-        }
+        }*/
     }
 
     public float Mirror

@@ -8,6 +8,7 @@ using TreeEditor;
 using System;
 using System.Dynamic;
 using NAudio.Dsp;
+using UnityEngine.SocialPlatforms.Impl;
 
 public class BeatDetector : MonoBehaviour
 {
@@ -18,14 +19,15 @@ public class BeatDetector : MonoBehaviour
     int DEBUG_HEIGHT = 64;
 
     [SerializeField] AudioLevelTracker m_level;
-    [SerializeField] AudioLevelTracker m_bass;
+    //[SerializeField] AudioLevelTracker m_bass;
 
     Texture2D m_debugTexture;
-    [SerializeField] RenderTexture m_fftTexture;
+    //[SerializeField] RenderTexture m_fftTexture;
 
     CircularBuffer<float> m_levelBuffer;
 
     [SerializeField] float m_correlationLerp = 0.99f;
+    [SerializeField] float m_bpmAttentionSpan = 0.999f;
 
     public float[] m_weights;
     public float[] m_currentWeights;
@@ -35,6 +37,9 @@ public class BeatDetector : MonoBehaviour
     int frameNum = 0;
     public float BPM = 0;
     public float BEAT = 0;
+    public float rawFreq = 0;
+    public float fitFreq = 0;
+    public float fitFreqBPM = 0;
 
 
     int MIN_BPM = 60;
@@ -74,6 +79,9 @@ public class BeatDetector : MonoBehaviour
         m_BPMBuffer = new CircularBuffer<float>(RMS_HISTORY_LENGTH);
         m_LFOBuffer = new CircularBuffer<float>(RMS_HISTORY_LENGTH);
         m_debugTexture = new Texture2D(RMS_HISTORY_LENGTH, DEBUG_HEIGHT);
+
+        ReferenceBeats = new float[RMS_HISTORY_LENGTH];
+
         m_debugTexture.filterMode = FilterMode.Point;
 
         for (int y = 0; y < m_debugTexture.height; y++)
@@ -92,25 +100,32 @@ public class BeatDetector : MonoBehaviour
         return (int)(bpm - BPM_MIN) * BPM_RESOLUTION; 
     }*/
 
-    [NonSerialized]  public float[] currentPeaks = new float[8];
-    [NonSerialized]  public float[] currentPeakWeights = new float[8];
-    [NonSerialized]  public float[] harmonicPeaks = new float[4];
-    [NonSerialized]  public float[] goodHarmonics = new float[4];
+    [NonSerialized]  public float[] currentPeaks = new float[16];
+    [NonSerialized]  public float[] currentPeakWeights = new float[16];
+    [NonSerialized]  public float[] harmonicPeaks = new float[9];
 
     float lastPredictedBeatTime = 0;
     float lastBeatTime = 0;
     float m_lastLevel = 0;
 
     float phaseOffset = 0;
-    
-    
+    public float harmonicThreshold = 1f;
+    public float offsetError = 1f;
+
+
     [NonSerialized] public float[] m_fftreals = new float[512];
     [NonSerialized] public float[] m_fftcomplex = new float[512];
     [NonSerialized] public float[] m_fftMag = new float[128];
     [NonSerialized] public float[] m_fftMagAvg = new float[128];
 
 
-    public int fftSkip = 0;
+    public int CorrOffset = 0;
+    public float[] ReferenceBeats;
+    public static float HammingWindow(int n, int frameSize)
+    {
+        return 1;
+        //return 0.54f - 0.46f * Mathf.Cos((2 * Mathf.PI * n) / (frameSize - 1));
+    }
 
     // Update is called at 100 FPS
     void FixedUpdate()
@@ -132,14 +147,14 @@ public class BeatDetector : MonoBehaviour
         for (int s = 0; s < MAX_SHIFT; s ++)
         {
             float sad = 0;
-            int numSamples = 0;
+            float numSamples = 0;
             for ( int i = 0; i < arr.Length; i ++)
             {
                 // This could be optimised to skip these by looping smarter maybe
                 if (  i + s < arr.Length )
                 {
-                    sad += Mathf.Abs(arr[i] - arr[i + s]);
-                    numSamples++;
+                    sad += Mathf.Abs(arr[i] - arr[i + s]) * HammingWindow(i, arr.Length);
+                    numSamples += HammingWindow(i, arr.Length);
                 }
             }
             if ( numSamples > 0)
@@ -160,43 +175,26 @@ public class BeatDetector : MonoBehaviour
         }
 
         GetPeaks(m_weights, 15);
-        //FindHarmonics(ref currentPeaks, ref harmonicPeaks);
-        //GetGoodHarmonics(ref harmonicPeaks, ref goodHarmonics);
 
-        AddInHarmonicPeaks(currentPeaks, currentPeakWeights);
+        GetHarmonicFromPeaks(ref currentPeaks, ref harmonicPeaks);
 
-        var lastBPM = BPM;
+        float lastFreq = BPM / 60f;
 
         GetMaxBPM();
 
+        GenerateCurve();
+
+
         // impulse detection
-        if (Time.time - lastBeatTime >( BPM/60) /2)
+        if (m_lastLevel < m_levelBuffer.Back() && m_levelBuffer.Back() > 0.99)
         {
-            if (m_lastLevel < m_levelBuffer.Back() && m_levelBuffer.Back() > 0.99)
-            {
-                lastBeatTime = Time.time;
-                BEAT = 1f;
-            }
+            lastBeatTime = Time.time;
+            BEAT = 1f;
         }
 
-
-        FastFourierTransform.FFT(true, 9, m_fftreals, m_fftcomplex);
-
-        for (int i = 0; i < fftSkip; i++)
-        {
-            m_fftMag[i] = 0;
-            m_fftreals[i] = 0;
-            m_fftcomplex[i] = 0;
-            m_fftMagAvg[i] = 0;
-        }
-
-        for (int i =fftSkip; i < m_fftMag.Length; i ++)
-        {
-            m_fftMag[i] = Mathf.Sqrt( m_fftreals[i] * m_fftreals[i] + m_fftcomplex[i] * m_fftcomplex[i]);
-            m_fftMagAvg[i] = Mathf.Lerp(m_fftMag[i], m_fftMagAvg[i], m_correlationLerp);
-        }
 
         BEAT *= 0.9f;
+
 
         var beat = Mathf.Round(BPM * 2)/8 * (Time.time - lastPredictedBeatTime) / 60f ;
 
@@ -204,19 +202,200 @@ public class BeatDetector : MonoBehaviour
         {
             lastPredictedBeatTime = Time.time;
             m_LFOBuffer.PushBack(1);
+        } 
+
+
+        float thisFreq = BPM / 60f;
+
+        thisFreq /= 4;
+        lastFreq /= 4;
+        //phaseOffset += Time.time * (lastFreq - thisFreq);
+
+        // check offset by autocorr with sawtooth
+        float minsad = 100;
+        int minsadIndex = 0;
+
+        var thbeatArr = BeatHistory;
+
+
+        for (int i = 0; i < ReferenceBeats.Length; i ++)
+        {
+            ReferenceBeats[i] = Mathf.Pow(1f - Fract(i / 50f * thisFreq* 4), 6f);
         }
 
 
-        phaseOffset = 0;
+        for (int s = 0; s < 256; s++)
+        {
+            float sad = 0;
+            float numSamples = 0;
+            for (int i = 0; i < thbeatArr.Length; i++)
+            {
+                // This could be optimised to skip these by looping smarter maybe
+                if (i + s < thbeatArr.Length)
+                {
+                    sad +=  (thbeatArr[i] - ReferenceBeats[i]) * (thbeatArr[i] - ReferenceBeats[i]);
+                    numSamples++;
+                }
+            }
+            if (numSamples > 0)
+            {
+                sad = sad / numSamples;
+                if ( sad < minsad)
+                {
+                    minsad = sad;
+                    minsadIndex = s;
+                }
+            }
+        }
 
-        float lfo = Mathf.Pow(0.5f + 0.5f * Mathf.Cos((beat - phaseOffset) * Mathf.PI * 2f), 1f);
+        CorrOffset = 512 - minsadIndex;
+        offsetError = minsad;
+
+        if ( Input.GetKeyDown(KeyCode.Space))
+        {
+            phaseOffset = Time.time;
+        }
+
+        float lfo = 1f -  Fract((Time.time - phaseOffset) * thisFreq );
+        lfo += (1f - Fract((Time.time - phaseOffset) * thisFreq * 2f )) * 0.5f;
+        lfo += (1f - Fract((Time.time - phaseOffset) * thisFreq * 4f )) * 0.25f;
+
+      //  float powLFO = Mathf.Pow(lfo, 80f);
         m_LFOBuffer.PushBack(lfo);
-
-
-        Camera.main.backgroundColor = Color.blue *lfo ;
-        Camera.main.backgroundColor += Color.red * BEAT;
+     
+        Camera.main.backgroundColor = Color.white * lfo/2f;
+        //Camera.main.backgroundColor += Color.red * BEAT;
        
         frameNum++;
+    }
+
+    private void GenerateCurve()
+    {
+    }
+
+    private int HowManyOverlap(ref float[] peaks, float freq)
+    {
+        int n = peaks.Length;
+        int k = m_weights.Length / (int)freq;
+        int overlap = 0;
+        for (int i = 0; i < k; i++)
+        {
+            for (int j = 0; j < n; j++)
+            {
+                if(Mathf.Abs(peaks[j] - freq * i) < harmonicThreshold)
+                {
+                    overlap++;
+                }
+            }
+        }
+
+        return overlap;
+    }
+
+    public struct PointF
+    {
+        public float X;
+        public float Y;
+
+        public PointF(float x, float y) : this()
+        {
+            this.X = x;
+            this.Y = y;
+        }
+    }
+
+    public float FindSlope(List<PointF> points )
+    {
+        float[] beatWeight = new float[] { 0, 1, 20, 1, 10, 1, 40, 1, 10 };
+        float avg = 0;
+        float weight = 0;
+
+        foreach (PointF p in points)
+        {
+            if ( p.X > 0 && p.Y > 0 && p.X < beatWeight.Length)
+            {
+                weight += p.X * p.X * beatWeight[(int)p.X];
+                avg += (p.Y / p.X) * (p.X * p.X * beatWeight[(int)p.X]);
+            }
+
+        }
+
+        return avg / weight;
+    }
+
+    private void GetHarmonicFromPeaks(ref float[] peaks, ref float[] harmonics)
+    {
+        int n = peaks.Length;
+        float bestfreq = -1;
+        float bestScore = -1;
+
+        for (int i = 0; i < n; i ++)
+        {
+            if (peaks[i] == 0)
+                continue;
+
+            for (int fundamental = 5; fundamental > 0; fundamental--)
+            { 
+                float freq = peaks[i] / fundamental;
+                
+                if ( freq > 10)
+                {
+                    int score = HowManyOverlap(ref peaks, freq);
+                    if (score > bestScore)
+                    {
+                        bestScore = score;
+                        bestfreq = freq;
+                    }
+                }
+            }
+        }
+
+  
+        rawFreq = bestfreq;
+
+        List<PointF> p = new List<PointF>();
+
+
+        for(int i = 0; i < n; i ++)
+        {
+            float k = Mathf.Round(peaks[i] / bestfreq);
+            if ( Mathf.Abs(k * bestfreq - peaks[i])  < harmonicThreshold)
+            {
+                p.Add(new PointF(k, peaks[i]));
+            }
+        }
+
+        float currentFitFreq = FindSlope(p);
+
+        float error = 0;
+        float errorNum = 0;
+        for (int i = 0; i < p.Count; i++)
+        {
+            if (p[i].X > 0)
+            {
+                error += Mathf.Abs(p[i].Y - p[i].X * currentFitFreq);
+                errorNum++;
+            }
+
+        }
+        error = error / errorNum;
+
+        if ( error > 0)
+        {
+        
+            float weight = 1f - 1f / (1f + Mathf.Exp(-error));
+            AddInPeak(fitFreq * 2, weight);
+
+            fitFreq = fitFreq * (1f - weight) + currentFitFreq * weight;
+        }
+
+
+        for (int j = 0; j < harmonics.Length; j++)
+        {
+            harmonics[j] = fitFreq * j;
+        }
+
+        fitFreqBPM= GetBPMFromOffset(fitFreq*2);
     }
 
     private void GetMaxBPM()
@@ -236,49 +415,26 @@ public class BeatDetector : MonoBehaviour
 
     int WINDOW_SIZE = 4;
 
-    private void AddInHarmonicPeaks(float[] harmonicPeaks, float[] weights)
+    private void AddInPeak(float peak, float weight)
     {
-        for(int i = 0; i < harmonicPeaks.Length; i ++)
+        float floatOffset = peak;
+        if (floatOffset > 10 && floatOffset < m_bpmHistogram.Length - WINDOW_SIZE)
         {
-            float floatOffset = harmonicPeaks[i];
-            if ( floatOffset > 10 && floatOffset < m_bpmHistogram.Length - WINDOW_SIZE)
+            float bpm = GetBPMFromOffset(floatOffset);
+            if (bpm > MIN_BPM && bpm < MAX_BPM)
             {
-                float bpm = GetBPMFromOffset(floatOffset);
-
-                for (float multiplier = 1; multiplier <= 4.0; multiplier ++)
+                for (int d = -WINDOW_SIZE; d <= WINDOW_SIZE; d++)
                 {
-                    float tgtbpm = bpm* multiplier;
-                    if (tgtbpm > MIN_BPM && tgtbpm < MAX_BPM)
-                    {
-                         for (int d = -WINDOW_SIZE; d <= WINDOW_SIZE; d++)
-                         {
-                             int d_i = (int)tgtbpm + d;
-                             float weight = 1 - Mathf.Abs((tgtbpm - d_i) / WINDOW_SIZE);
-                             m_bpmHistogram[d_i] += weight * weights[i];
-
-                         }
-                    }
-                }
-                for (float multiplier = 2; multiplier <= 4.0; multiplier++)
-                {
-                    float tgtbpm = bpm / multiplier;
-                    if (tgtbpm > MIN_BPM && tgtbpm < MAX_BPM)
-                    {
-                        for (int d = -WINDOW_SIZE; d <= WINDOW_SIZE; d++)
-                        {
-                            int d_i = (int)tgtbpm + d;
-                            float weight = 1 - Mathf.Abs((tgtbpm - d_i) / WINDOW_SIZE);
-                            m_bpmHistogram[d_i] += weight * weights[i];
-
-                        }
-                    }
+                    int d_i = (int)bpm + d;
+                    float window = 1 - Mathf.Abs((bpm - d_i) / WINDOW_SIZE);
+                    m_bpmHistogram[d_i] += window * weight;
                 }
             }
         }
 
         for (int i = 0; i < m_bpmHistogram.Length; i++)
         {
-            m_bpmHistogram[i] *= 0.99f;
+        m_bpmHistogram[i] *= m_bpmAttentionSpan;
         }
     }
 
@@ -287,58 +443,10 @@ public class BeatDetector : MonoBehaviour
         return i - Mathf.Floor(i);
     }
 
-    private void GetGoodHarmonics(ref float[] harmonicPeaks, ref float[] goodHarmonics)
-    {
-        for (int i = 0; i < goodHarmonics.Length; i++)
-            goodHarmonics[i] = 0;
-
-
-        Array.Sort(harmonicPeaks);
-        int goodIndex = 1;
-        goodHarmonics[0] = harmonicPeaks[0];
-        for(int i = 1; i < harmonicPeaks.Length; i ++)
-        {
-            if (Fract(harmonicPeaks[i] / harmonicPeaks[0]) < 0.15f)
-            {
-                goodHarmonics[goodIndex] = harmonicPeaks[i];
-                goodIndex++;
-                if (goodIndex >= goodHarmonics.Length)
-                    break;
-            }
-
-        }
-    }
-
-    private void FindHarmonics(ref float[] currentPeaks, ref float[] harmonicPeaks)
-    {
-        for(int i = 0; i < harmonicPeaks.Length; i++)
-            harmonicPeaks[i] = 0;
-
-        int harmonicNum = 0;
-        for(int i = 0; i <  currentPeaks.Length; i++ )
-        {
-            int h = 0;
-            for (int j = 0; j < currentPeaks.Length; j++)
-            {
-                if ( Mathf.Abs(currentPeaks[i] - currentPeaks[j]*2) < 1f ||
-                    Mathf.Abs(currentPeaks[i] - currentPeaks[j] / 2) < 1f)
-                {
-                    h++;
-                }
-            }
-            if ( h > 0)
-            {
-                harmonicPeaks[harmonicNum] = currentPeaks[i];
-                harmonicNum++;
-                if (harmonicNum == harmonicPeaks.Length)
-                    break;
-            }
-        }
-    }
-
     public void  GetPeaks(float[] data, int start)
     {
-        var peakIndex = 0;
+        var peakIndex = 1;
+        currentPeaks[0] = 0;
         for (int i = start+1; i < data.Length - 1; i ++)
         {
             if ( data[i-1] > data[i] && data[i+1] > data[i])

@@ -46,7 +46,7 @@ MonoBehaviour:
     value: 1
   amount:
     overrideState: 1
-    value: 0
+    value: 0.7
 --- !u!114 &-4583526845470201036
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -155,7 +155,7 @@ MonoBehaviour:
     value: 0
   postExposure:
     overrideState: 1
-    value: 1
+    value: 0.5
   contrast:
     overrideState: 0
     value: 0
