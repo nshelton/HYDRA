@@ -130,7 +130,7 @@ public class PhysicsSpawners : PhysicsSystem
 
             if (m_doMaterialProperties)
             {
-                m_materialPropertyBlock.SetColor("_Color", m_colorGrad.Evaluate(mappedValue));
+                m_materialPropertyBlock.SetColor("_BaseColor", m_colorGrad.Evaluate(mappedValue));
                 for ( int j = 0; j < m_allParticles[i].Renderers.Length; j++)
                 {
                     m_allParticles[i].Renderers[j].SetPropertyBlock(m_materialPropertyBlock);
