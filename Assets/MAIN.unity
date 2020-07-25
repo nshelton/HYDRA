@@ -2525,7 +2525,7 @@ MonoBehaviour:
   m_linear: {fileID: 68270315}
   m_brownian: {fileID: 663574899}
   m_follow: {fileID: 2006374021}
-  m_cameraJump: {fileID: 0}
+  m_cameraJump: {fileID: 2006374022}
   m_transforms:
   - {fileID: 1901607474}
   - {fileID: 965846438}
