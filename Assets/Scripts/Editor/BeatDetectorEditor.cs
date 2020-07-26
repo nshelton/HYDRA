@@ -91,11 +91,6 @@ namespace Lasp.Editor
             if (EditorApplication.isPlaying)
             {
                 DrawGraph(targetComponent.m_currentLevels);
-                GUILayout.Label("RMS History");
-                GUILayout.Label("THE BEAT");
-                DrawGraph(targetComponent.BeatHistory, new float[1] { targetComponent.CorrOffset }, new float[1] { targetComponent.CorrOffset });
-                GUILayout.Label("THE BEAT");
-                DrawGraph(targetComponent.ReferenceBeats);
                 //GUILayout.Label("FFT");
                 // DrawGraph(targetComponent.m_fftMagAvg);
                 DrawGraph(targetComponent.m_weights, targetComponent.currentPeaks, targetComponent.harmonicPeaks);
@@ -103,8 +98,6 @@ namespace Lasp.Editor
                 DrawGraph(targetComponent.m_bpmHistogram, new float[1] { targetComponent.BPM });
                 GUILayout.Label($"bpmHistogram: \tPeak{targetComponent.BPM}");
 
-                DrawGraph(targetComponent.LFOHistory);
-                GUILayout.Label("THE BEAT");
             }
 
             serializedObject.ApplyModifiedProperties();

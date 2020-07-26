@@ -7,7 +7,6 @@ using UnityEditor.Rendering;
 using TreeEditor;
 using System;
 using System.Dynamic;
-using NAudio.Dsp;
 using UnityEngine.SocialPlatforms.Impl;
 
 public class BeatDetector : MonoBehaviour
@@ -19,10 +18,8 @@ public class BeatDetector : MonoBehaviour
     int DEBUG_HEIGHT = 64;
 
     [SerializeField] AudioLevelTracker m_level;
-    //[SerializeField] AudioLevelTracker m_bass;
 
     Texture2D m_debugTexture;
-    //[SerializeField] RenderTexture m_fftTexture;
 
     CircularBuffer<float> m_levelBuffer;
 
@@ -36,21 +33,22 @@ public class BeatDetector : MonoBehaviour
 
     int frameNum = 0;
     public float BPM = 0;
-    public float BEAT = 0;
     public float rawFreq = 0;
     public float fitFreq = 0;
     public float fitFreqBPM = 0;
 
-
     int MIN_BPM = 60;
     int MAX_BPM = 180;
-    int BPM_DIVISIONS = 4;
 
 
     CircularBuffer<float> m_beatBuffer;
     CircularBuffer<float> m_BPMBuffer;
     CircularBuffer<float> m_LFOBuffer;
 
+    public float GetBeat(int multiplier)
+    {
+         return 1f - Fract((Time.time - phaseOffset) * (BPM / multiplier) / 60f); 
+    }
 
     public float[] BeatHistory
     {
@@ -79,8 +77,6 @@ public class BeatDetector : MonoBehaviour
         m_BPMBuffer = new CircularBuffer<float>(RMS_HISTORY_LENGTH);
         m_LFOBuffer = new CircularBuffer<float>(RMS_HISTORY_LENGTH);
         m_debugTexture = new Texture2D(RMS_HISTORY_LENGTH, DEBUG_HEIGHT);
-
-        ReferenceBeats = new float[RMS_HISTORY_LENGTH];
 
         m_debugTexture.filterMode = FilterMode.Point;
 
@@ -118,16 +114,7 @@ public class BeatDetector : MonoBehaviour
     [NonSerialized] public float[] m_fftMag = new float[128];
     [NonSerialized] public float[] m_fftMagAvg = new float[128];
 
-
-    public int CorrOffset = 0;
-    public float[] ReferenceBeats;
-    public static float HammingWindow(int n, int frameSize)
-    {
-        return 1;
-        //return 0.54f - 0.46f * Mathf.Cos((2 * Mathf.PI * n) / (frameSize - 1));
-    }
-
-    // Update is called at 100 FPS
+    // Update is called at 50 FPS
     void FixedUpdate()
     {
         if (!m_levelBuffer.IsEmpty)
@@ -136,7 +123,6 @@ public class BeatDetector : MonoBehaviour
         }
 
         m_levelBuffer.PushBack(m_level.normalizedLevel);
-        m_beatBuffer.PushBack(BEAT);
         m_BPMBuffer.PushBack(BPM);
 
         var arr = m_levelBuffer.ToArray();
@@ -150,13 +136,13 @@ public class BeatDetector : MonoBehaviour
             float numSamples = 0;
             for ( int i = 0; i < arr.Length; i ++)
             {
-                // This could be optimised to skip these by looping smarter maybe
                 if (  i + s < arr.Length )
                 {
-                    sad += Mathf.Abs(arr[i] - arr[i + s]) * HammingWindow(i, arr.Length);
-                    numSamples += HammingWindow(i, arr.Length);
+                    sad += Mathf.Abs(arr[i] - arr[i + s]);
+                    numSamples++;
                 }
             }
+
             if ( numSamples > 0)
                 m_currentWeights[s] = sad / numSamples;
         }
@@ -178,100 +164,18 @@ public class BeatDetector : MonoBehaviour
 
         GetHarmonicFromPeaks(ref currentPeaks, ref harmonicPeaks);
 
-        float lastFreq = BPM / 60f;
-
         GetMaxBPM();
 
-        GenerateCurve();
-
-
-        // impulse detection
-        if (m_lastLevel < m_levelBuffer.Back() && m_levelBuffer.Back() > 0.99)
-        {
-            lastBeatTime = Time.time;
-            BEAT = 1f;
-        }
-
-
-        BEAT *= 0.9f;
-
-
-        var beat = Mathf.Round(BPM * 2)/8 * (Time.time - lastPredictedBeatTime) / 60f ;
-
-        if (( BEAT > 0.9 && beat > 0.9) || lastPredictedBeatTime > 5)
-        {
-            lastPredictedBeatTime = Time.time;
-            m_LFOBuffer.PushBack(1);
-        } 
-
-
         float thisFreq = BPM / 60f;
-
-        thisFreq /= 4;
-        lastFreq /= 4;
-        //phaseOffset += Time.time * (lastFreq - thisFreq);
-
-        // check offset by autocorr with sawtooth
-        float minsad = 100;
-        int minsadIndex = 0;
-
-        var thbeatArr = BeatHistory;
-
-
-        for (int i = 0; i < ReferenceBeats.Length; i ++)
-        {
-            ReferenceBeats[i] = Mathf.Pow(1f - Fract(i / 50f * thisFreq* 4), 6f);
-        }
-
-
-        for (int s = 0; s < 256; s++)
-        {
-            float sad = 0;
-            float numSamples = 0;
-            for (int i = 0; i < thbeatArr.Length; i++)
-            {
-                // This could be optimised to skip these by looping smarter maybe
-                if (i + s < thbeatArr.Length)
-                {
-                    sad +=  (thbeatArr[i] - ReferenceBeats[i]) * (thbeatArr[i] - ReferenceBeats[i]);
-                    numSamples++;
-                }
-            }
-            if (numSamples > 0)
-            {
-                sad = sad / numSamples;
-                if ( sad < minsad)
-                {
-                    minsad = sad;
-                    minsadIndex = s;
-                }
-            }
-        }
-
-        CorrOffset = 512 - minsadIndex;
-        offsetError = minsad;
 
         if ( Input.GetKeyDown(KeyCode.Space))
         {
             phaseOffset = Time.time;
         }
-
-        float lfo = 1f -  Fract((Time.time - phaseOffset) * thisFreq );
-        lfo += (1f - Fract((Time.time - phaseOffset) * thisFreq * 2f )) * 0.5f;
-        lfo += (1f - Fract((Time.time - phaseOffset) * thisFreq * 4f )) * 0.25f;
-
-      //  float powLFO = Mathf.Pow(lfo, 80f);
-        m_LFOBuffer.PushBack(lfo);
      
-        Camera.main.backgroundColor = Color.white * lfo/2f;
-        //Camera.main.backgroundColor += Color.red * BEAT;
-       
         frameNum++;
     }
 
-    private void GenerateCurve()
-    {
-    }
 
     private int HowManyOverlap(ref float[] peaks, float freq)
     {

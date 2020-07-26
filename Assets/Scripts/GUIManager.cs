@@ -13,6 +13,8 @@ public class GUIManager : MonoBehaviour
 
     void Start()
     {
+        GUIUtility.Init();
+
         foreach(var module in m_modules)
         {
             module.Init();
@@ -34,7 +36,7 @@ public class GUIManager : MonoBehaviour
             if (activeRect.y + module.GetHeight() > Screen.height)
             {
                 activeRect.x += MODULEWIDTH;
-                activeRect.y = 0;
+                activeRect.y = PADDING;
 
             }
         }
