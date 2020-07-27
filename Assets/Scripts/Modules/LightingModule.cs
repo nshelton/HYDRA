@@ -10,6 +10,7 @@ public class LightingModule : BaseGUIModule
     public HDAdditionalLightData m_dirLight;
     public HDAdditionalCameraData m_camera;
     public VolumeProfile m_volume;
+    public ColorAdjustments m_color;
 
     private GradientSky m_gradientSky;
     private HDRISky m_hdri;
@@ -29,8 +30,32 @@ public class LightingModule : BaseGUIModule
                 m_env = component as VisualEnvironment;
             if (component is HDRISky)
                 m_hdri = component as HDRISky;
+            if (component is ColorAdjustments)
+                m_color = component as ColorAdjustments;
 
         }
+
+
+        m_parameters.Add(new GUIFloat()
+        {
+            effect = v => m_color.postExposure.value = v,
+            min = -3,
+            max = 4,
+            value = 0,
+            name = "Exposure"
+        });
+
+
+
+        m_parameters.Add(new GUIFloat()
+        {
+            effect = v => m_color.saturation.value = v,
+            min = -100,
+            max = 100,
+            value = 0,
+            name = "Saturation"
+        });
+
 
         m_parameters.Add(new GUIFloat()
         {

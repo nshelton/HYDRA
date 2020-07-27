@@ -186,7 +186,7 @@ public class GUIFloat
 
         /// Parameter Controls
 
-        lerp = GUI.VerticalSlider(new Rect(200, 0, 30, 150), lerp, 0.5f, 1.0f);
+        lerp = GUI.VerticalSlider(new Rect(200, 0, 30, 150), lerp, 0.1f, 1.0f);
         power = GUI.VerticalSlider(new Rect(230, 0, 30, 150), power, 0.1f, 5.0f);
         duty = GUI.VerticalSlider(new Rect(260, 0, 30, 150), duty, 0f, 1f);
 

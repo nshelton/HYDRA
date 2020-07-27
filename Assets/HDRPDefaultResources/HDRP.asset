@@ -348,6 +348,8 @@ MonoBehaviour:
   - Kino.PostProcessing.Streak, Kino.Postprocessing, Version=0.0.0.0, Culture=neutral,
     PublicKeyToken=null
   afterPostProcessCustomPostProcesses:
+  - Kino.PostProcessing.Chroma, Kino.Postprocessing, Version=0.0.0.0, Culture=neutral,
+    PublicKeyToken=null
   - Kino.PostProcessing.Sharpen, Kino.Postprocessing, Version=0.0.0.0, Culture=neutral,
     PublicKeyToken=null
   - Kino.PostProcessing.Recolor, Kino.Postprocessing, Version=0.0.0.0, Culture=neutral,
@@ -361,4 +363,6 @@ MonoBehaviour:
   - Kino.PostProcessing.Utility, Kino.Postprocessing, Version=0.0.0.0, Culture=neutral,
     PublicKeyToken=null
   - Kino.PostProcessing.TestCard, Kino.Postprocessing, Version=0.0.0.0, Culture=neutral,
+    PublicKeyToken=null
+  - Kino.PostProcessing.Mirror, Kino.Postprocessing, Version=0.0.0.0, Culture=neutral,
     PublicKeyToken=null

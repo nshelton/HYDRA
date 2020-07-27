@@ -1,5 +1,24 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-8027555540642277223
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4f7b262c0d17f3f49921b567b454a9f8, type: 3}
+  m_Name: Sharpen
+  m_EditorClassIdentifier: 
+  active: 1
+  m_AdvancedMode: 0
+  intensity:
+    m_OverrideState: 1
+    m_Value: 0
+    min: 0
+    max: 1
 --- !u!114 &-5374331239712613857
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -16,27 +35,27 @@ MonoBehaviour:
   m_AdvancedMode: 0
   block:
     m_OverrideState: 1
-    m_Value: 0.37
+    m_Value: 0
     min: 0
     max: 1
   drift:
     m_OverrideState: 1
-    m_Value: 0.454
+    m_Value: 0
     min: 0
     max: 1
   jitter:
     m_OverrideState: 1
-    m_Value: 0.48
+    m_Value: 0
     min: 0
     max: 1
   jump:
     m_OverrideState: 1
-    m_Value: 0.353
+    m_Value: 0
     min: 0
     max: 1
   shake:
     m_OverrideState: 1
-    m_Value: 0.285
+    m_Value: 0
     min: 0
     max: 1
 --- !u!114 &-5270674323830632367
@@ -54,13 +73,13 @@ MonoBehaviour:
   active: 1
   m_AdvancedMode: 0
   sourceType:
-    m_OverrideState: 0
+    m_OverrideState: 1
     m_Value: 1
   blendMode:
-    m_OverrideState: 0
-    m_Value: 2
+    m_OverrideState: 1
+    m_Value: 5
   opacity:
-    m_OverrideState: 0
+    m_OverrideState: 1
     m_Value: 0
     min: 0
     max: 1
@@ -71,28 +90,28 @@ MonoBehaviour:
     showAlpha: 0
     showEyeDropper: 1
   gradient:
-    m_OverrideState: 0
+    m_OverrideState: 1
     m_Value:
       serializedVersion: 2
-      key0: {r: 0, g: 0, b: 1, a: 1}
-      key1: {r: 1, g: 0, b: 0, a: 1}
-      key2: {r: 0, g: 0, b: 0, a: 0}
-      key3: {r: 0, g: 0, b: 0, a: 0}
+      key0: {r: 0.4198113, g: 1, b: 0.9080307, a: 1}
+      key1: {r: 0.8368155, g: 0.41006586, b: 0.8962264, a: 1}
+      key2: {r: 0.31246808, g: 2.7127912, b: 2.4552798, a: 0.9577465}
+      key3: {r: 1, g: 1, b: 1, a: 0}
       key4: {r: 0, g: 0, b: 0, a: 0}
       key5: {r: 0, g: 0, b: 0, a: 0}
       key6: {r: 0, g: 0, b: 0, a: 0}
       key7: {r: 0, g: 0, b: 0, a: 0}
       ctime0: 0
       ctime1: 65535
-      ctime2: 0
-      ctime3: 0
+      ctime2: 32960
+      ctime3: 42212
       ctime4: 0
       ctime5: 0
       ctime6: 0
       ctime7: 0
       atime0: 0
       atime1: 65535
-      atime2: 0
+      atime2: 65535
       atime3: 0
       atime4: 0
       atime5: 0
@@ -102,7 +121,7 @@ MonoBehaviour:
       m_NumColorKeys: 2
       m_NumAlphaKeys: 2
   angle:
-    m_OverrideState: 0
+    m_OverrideState: 1
     m_Value: 0
     min: -180
     max: 180
@@ -160,6 +179,25 @@ MonoBehaviour:
   _blockSeed1: 71
   _blockSeed2: 113
   _blockStride: 1
+--- !u!114 &-2536147376105561046
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1442f4d0f56fc5746b55895efbebbd8c, type: 3}
+  m_Name: Mirror
+  m_EditorClassIdentifier: 
+  active: 1
+  m_AdvancedMode: 0
+  intensity:
+    m_OverrideState: 1
+    m_Value: 0
+    min: 0
+    max: 1
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -176,6 +214,28 @@ MonoBehaviour:
   - {fileID: -5374331239712613857}
   - {fileID: 8653761726145517244}
   - {fileID: -5270674323830632367}
+  - {fileID: -8027555540642277223}
+  - {fileID: 2899848362569452875}
+  - {fileID: -2536147376105561046}
+--- !u!114 &2899848362569452875
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b7f8b8e7ccc99cf47b9c66cdc2249384, type: 3}
+  m_Name: Chroma
+  m_EditorClassIdentifier: 
+  active: 1
+  m_AdvancedMode: 0
+  intensity:
+    m_OverrideState: 1
+    m_Value: 0
+    min: 0
+    max: 100
 --- !u!114 &8653761726145517244
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -191,15 +251,15 @@ MonoBehaviour:
   active: 1
   m_AdvancedMode: 0
   rowCount:
-    m_OverrideState: 0
+    m_OverrideState: 1
     m_Value: 30
   angle:
-    m_OverrideState: 0
+    m_OverrideState: 1
     m_Value: 0
     min: -90
     max: 90
   displacement:
-    m_OverrideState: 0
+    m_OverrideState: 1
     m_Value: 0
     min: -1
     max: 1
