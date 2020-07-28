@@ -29,16 +29,11 @@ public class AudioModule : BaseGUIModule
         m_beatTexture = new Texture2D(256, 64, UnityEngine.Experimental.Rendering.DefaultFormat.LDR, UnityEngine.Experimental.Rendering.TextureCreationFlags.None);
         m_levelTexture = new Texture2D(256, 64, UnityEngine.Experimental.Rendering.DefaultFormat.LDR, UnityEngine.Experimental.Rendering.TextureCreationFlags.None);
       
-        m_parameters.Add(new GUIFloat()
-        {
-            effect = v => {
+        m_parameters.Add(new GUIFloat("dynamic range", 1f, 50f, 25f, delegate( float v )
+        { 
                 m_level.dynamicRange = v;
-                m_analyzer.dynamicRange = v; },
-            min = 1,
-            max = 40,
-            value = 25,
-            name = "dynamic range"
-        });
+                m_analyzer.dynamicRange = v; 
+        }));
 
 
     }

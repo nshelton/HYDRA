@@ -5,8 +5,13 @@ using UnityEngine;
 public class GUIUtility 
 {
 
+    public static CustomSlider ActiveControl;
+
     public static Texture2D LightGrayTexture;
     public static Texture2D GrayTexture;
+
+
+    public static Texture2D ButtonTexture;
 
     public static void Init()
     {

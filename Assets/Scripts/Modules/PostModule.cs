@@ -34,15 +34,10 @@ public class PostModule : BaseGUIModule
                     ClampedFloatParameter item = thisVar.GetValue(cast) as ClampedFloatParameter;
                     if (item != null)
                     {
-                        m_parameters.Add(new GUIFloat()
+                        m_parameters.Add(new GUIFloat(effectName + "." + thisVar.Name, item.min, item.max, 0, delegate (float v)
                         {
-                            effect = v => item.value = v,
-                            min = item.min,
-                            max = item.max,
-                            value = 0,
-                            name = effectName + "." + thisVar.Name
-                        });
-
+                            item.value = v;
+                        }));
                     }
                 }
 

@@ -13,41 +13,25 @@ public class ModelModule : BaseGUIModule
 
     public override void Init()
     {
-        m_parameters.Add(new GUIFloat()
+        m_parameters.Add(new GUIFloat("scale", 0, 3, 1, delegate(float v)
         {
-            name = "scale",
-            effect = v => m_scaleTransform.localScale = Vector3.one * v,
-            min = 0,
-            max = 3,
-            value = 1,
-        });
+            m_scaleTransform.localScale = Vector3.one * v;
+        }));
 
-        m_parameters.Add(new GUIFloat()
+        m_parameters.Add(new GUIFloat("position", 0, 3, 1, delegate (float v)
         {
-            name = "move",
-            effect = v => m_brownianMotion.positionAmount = Vector3.one * v,
-            min = 0,
-            max = 3,
-            value = 1,
-        });
+            m_brownianMotion.positionAmount = Vector3.one * v; 
+        }));
 
-        m_parameters.Add(new GUIFloat()
+        m_parameters.Add(new GUIFloat("rotation", 0, 180, 1, delegate (float v)
         {
-            name = "rotation",
-            effect = v => m_brownianMotion.rotationAmount = Vector3.one * v,
-            min = 0,
-            max = 180,
-            value = 1,
-        });
+            m_brownianMotion.rotationAmount = Vector3.one * v;
+        }));
 
-        m_parameters.Add(new GUIFloat()
+        m_parameters.Add(new GUIFloat("frequency", 0, 1, 0.1f, delegate (float v)
         {
-            name = "frequency",
-            effect = v => m_brownianMotion.frequency = v,
-            min = 0,
-            max = 1,
-            value = 0.1f,
-        });
+            m_brownianMotion.frequency = v;
+        }));
     }
 
 }

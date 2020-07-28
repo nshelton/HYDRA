@@ -13,7 +13,6 @@ public class VFXModule : BaseGUIModule
 {
 
     private VisualEffect m_effect;
-    private VFXPropertyBinder m_binder;
 
     private string m_name;
     public override string Name() { return m_name; }
@@ -22,7 +21,6 @@ public class VFXModule : BaseGUIModule
     {
 
         m_effect = GetComponent<VisualEffect>();
-        m_binder = GetComponent<VFXPropertyBinder>();
 
         m_name = "VFX." + m_effect.name;
 
@@ -34,14 +32,10 @@ public class VFXModule : BaseGUIModule
         {
             if (prop.type == typeof(float))
             {
-                m_parameters.Add(new GUIFloat()
+                m_parameters.Add(new GUIFloat(prop.name, 0, 1, 0, delegate (float v)
              {
-                 effect = v => m_effect.SetFloat(prop.name, v),
-                 min = 0,
-                 max = 1, 
-                 value = 0,
-                 name = prop.name
-             });
+                 m_effect.SetFloat(prop.name, v);
+             }));
             }
         }
     }

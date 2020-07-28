@@ -1,4 +1,5 @@
 ﻿using System;
+using System.CodeDom;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -37,7 +38,22 @@ public class GUIFloat
     public float power = 1;
     public float duty = 1;
 
-    private bool routingModal = false;
+    public bool ShowRoutingModal = false;
+
+    private CustomSlider m_slider;
+
+    public GUIFloat(string name, float min, float max, float value, Action<float> effect)
+    {
+        this.min = min;
+        this.max = max;
+        this.value = value;
+        this.effect = effect;
+        this.name = name;
+
+        m_slider = new CustomSlider(this.min, this.max, this.value, name, this);
+
+
+    }
 
     Rect GetWindowRect(Rect button)
     {
@@ -69,30 +85,27 @@ public class GUIFloat
                 newVal = RoutingServer.SampleOscillator(oscillatorType, oscillatorFrequency);
                 break;
         }
+
         newVal = min + newVal * (max - min);
-        value = Mathf.Lerp(value, newVal, lerp * lerp * lerp * lerp);
+        value = Mathf.Lerp(value, newVal, lerp);
+
+        m_slider.value = value;
     }
 
     public void DrawGUI(Rect sliderRect)
     {
-        sliderRect.width -= sliderRect.height;
-        value = GUI.HorizontalSlider(sliderRect, value, min, max);
-        GUI.Label(sliderRect, name + "\t" + value.ToString("0.##"));
-
-        sliderRect.x += sliderRect.width;
-        sliderRect.width = sliderRect.height;
-
-        if(GUI.Button(sliderRect, "O"))
+        value = m_slider.Draw(sliderRect);
+        
+        if (ShowRoutingModal)
         {
-            routingModal = true;
+            GUI.Window(0, GetWindowRect(sliderRect), RoutingWindow, "");
+            if ( Event.current.button != -1 && !sliderRect.Contains(Event.current.mousePosition))
+            {
+                ShowRoutingModal = false;
+            }
         }
 
-        if ( routingModal )
-        {
-             GUI.Window(0, GetWindowRect(sliderRect), RoutingWindow, "");
-        }
-
-        effect(Mathf.Pow(value, power));
+        effect(value);
     }
 
     void RoutingWindow(int windowID)
@@ -105,33 +118,35 @@ public class GUIFloat
         if (GUI.Button(new Rect(0, 0, 67, 50), "low"))
         {
             routingType = RoutingType.AudioLow;
-            routingModal = false;
+            ShowRoutingModal = false;
         }
 
         GUI.color = routingType == RoutingType.AudioBypass ? selectedColor : normalColor;
         if (GUI.Button(new Rect(67, 0, 67, 50), "all"))
         {
             routingType = RoutingType.AudioBypass;
-            routingModal = false;
+            ShowRoutingModal = false;
         }
 
         GUI.color = routingType == RoutingType.AudioHigh ? selectedColor : normalColor;
         if (GUI.Button(new Rect(134, 0, 67, 50), "high"))
         {
             routingType = RoutingType.AudioHigh;
-            routingModal = false;
+            ShowRoutingModal = false;
         }
 
         GUI.color = normalColor;
-        if (GUI.Button(new Rect(0, 50, 100, 50), "back"))
+        if (GUI.Button(new Rect(1000, 50, 100, 50), "back"))
         {
-            routingModal = false;
+            ShowRoutingModal = false;
         }
 
-        if (GUI.Button(new Rect(100, 50, 100, 50), "clear"))
+        if (GUI.Button(new Rect(0, 50, 100, 50), "clear"))
         {
             routingType = RoutingType.None;
-            routingModal = false;
+            value = m_slider.defaultValue;
+            m_slider.value = m_slider.defaultValue;
+            ShowRoutingModal = false;
         }
 
         GUI.color = routingType == RoutingType.Oscillator && oscillatorType == OscillatorType.Saw ? selectedColor : normalColor;
@@ -160,28 +175,28 @@ public class GUIFloat
         if (GUI.Button(new Rect(0, 150, 50, 50), "1"))
         {
             oscillatorFrequency = 1;
-            routingModal = false;
+            ShowRoutingModal = false;
         }
 
         GUI.color = routingType == RoutingType.Oscillator && oscillatorFrequency == 2 ? selectedColor : normalColor;
         if (GUI.Button(new Rect(50, 150, 50, 50), "2"))
         {
             oscillatorFrequency = 2;
-            routingModal = false;
+            ShowRoutingModal = false;
         }
 
         GUI.color = routingType == RoutingType.Oscillator && oscillatorFrequency == 4 ? selectedColor : normalColor;
         if (GUI.Button(new Rect(100, 150, 50, 50), "4"))
         {
             oscillatorFrequency = 4;
-            routingModal = false;
+            ShowRoutingModal = false;
         }
 
         GUI.color = routingType == RoutingType.Oscillator && oscillatorFrequency == 8 ? selectedColor : normalColor;
         if (GUI.Button(new Rect(150, 150, 50, 50), "8"))
         {
             oscillatorFrequency = 8;
-            routingModal = false;
+            ShowRoutingModal = false;
         }
 
         /// Parameter Controls

@@ -36,83 +36,47 @@ public class LightingModule : BaseGUIModule
         }
 
 
-        m_parameters.Add(new GUIFloat()
+        m_parameters.Add(new GUIFloat("Exposure", -3, 4, 0,
+            delegate (float v) { m_color.postExposure.value = v; }));
+
+        m_parameters.Add(new GUIFloat("Saturation", -100, 100, 0, delegate (float v) 
+        { 
+            m_color.saturation.value = v; 
+        }));
+
+        m_parameters.Add(new GUIFloat("Ambient", 0, 3, 1, delegate (float v)
         {
-            effect = v => m_color.postExposure.value = v,
-            min = -3,
-            max = 4,
-            value = 0,
-            name = "Exposure"
-        });
+            m_hdri.multiplier.value = v;
+            m_gradientSky.multiplier.value = v;
+        }));
 
-
-
-        m_parameters.Add(new GUIFloat()
+        m_parameters.Add(new GUIFloat("Directional", 0, 3, 1, delegate (float v)
         {
-            effect = v => m_color.saturation.value = v,
-            min = -100,
-            max = 100,
-            value = 0,
-            name = "Saturation"
-        });
+            m_dirLight.SetIntensity(v);
+        }));
 
 
-        m_parameters.Add(new GUIFloat()
+        m_parameters.Add(new GUIFloat("Time", 0, 2, 1, delegate (float v)
         {
-            effect = v =>
-            {
-                m_hdri.multiplier.value = v;
-                m_gradientSky.multiplier.value = v;
-            },
-            min = 0,
-            max = 3,
-            value = 1,
-            name = "Ambient"
-        });
+            Time.timeScale = v;
+        }));
 
-        m_parameters.Add(new GUIFloat()
+
+        m_parameters.Add(new GUIFloat("Environment", 0, 3, 3, delegate (float v) 
         {
-            effect = v => m_dirLight.SetIntensity(v),
-            min = 0,
-            max = 3,
-            value = 1,
-            name = "Directional"
-        });
+            if ( v < 1)       {
 
-        m_parameters.Add(new GUIFloat()
-        {
-            effect = v => Time.timeScale = v,
-            min = 0,
-            max = 2,
-            value = 1,
-            name = "Time"
-        });
+                m_camera.clearColorMode = HDAdditionalCameraData.ClearColorMode.Sky;
+                m_env.skyType.value = 1;
+            } else if (v < 2)  {
 
-        m_parameters.Add(new GUIFloat()
-        {
-            effect = v => 
-            {
-                if ( v < 1)       {
-
-                    m_camera.clearColorMode = HDAdditionalCameraData.ClearColorMode.Sky;
-                    m_env.skyType.value = 1;
-                } else if (v < 2)  {
-
-                    m_camera.clearColorMode = HDAdditionalCameraData.ClearColorMode.Sky;
-                    m_env.skyType.value = 3;
-                }
-                else {
-                    m_camera.clearColorMode = HDAdditionalCameraData.ClearColorMode.Color;
-                }
-            },
-            min = 0,
-            max = 3,
-            value = 3,
-            name = "Environment"
-        });
-
-
-
-    }
+                m_camera.clearColorMode = HDAdditionalCameraData.ClearColorMode.Sky;
+                m_env.skyType.value = 3;
+            }
+            else {
+                m_camera.clearColorMode = HDAdditionalCameraData.ClearColorMode.Color;
+            }
+        }));
+    }   
 
 }

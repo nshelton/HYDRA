@@ -19,43 +19,26 @@ public class CameraModule : BaseGUIModule
 
     public override void Init()
     {
-        m_parameters.Add(new GUIFloat()
+
+        m_parameters.Add(new GUIFloat("fov", 25, 120, 80, delegate(float v)
         {
-            name = "fov",
-            effect = v => m_camera.fieldOfView = v,
-            min = 25,
-            max = 120,
-            value = 80,
-        });
+            m_camera.fieldOfView = v;
+        }));
 
 
-        m_parameters.Add(new GUIFloat()
+        m_parameters.Add(new GUIFloat("offset", 0, 10, 2, delegate (float v) 
         {
-            name = "Offset",
-            effect = v =>
+            foreach (var off in m_zOffsetTransforms)
             {
-                foreach (var off in m_zOffsetTransforms)
-                {
-                    off.localPosition = Vector3.back * v;
-                }
-            },
-            min = 0,
-            max = 10,
-            value = 2f,
-        });
+                off.localPosition = Vector3.back * v;
+            }
+        }));
 
-        m_parameters.Add(new GUIFloat()
+        m_parameters.Add(new GUIFloat("Intensity", 0, 1, 0.5f, delegate(float v)
         {
-            name = "Intensity",
-            effect = v =>
-            {
                 m_linear.angularVelocity = Vector3.up * v * 90f;
                 m_brownian.rotationAmount = new Vector3(90, 180, 90) * v;
-            },
-            min = 0,
-            max = 1,
-            value = 0.5f,
-        });
+        }));
 
         m_triggers.Add(new GUITrigger()
         {
