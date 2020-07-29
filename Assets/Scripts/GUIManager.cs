@@ -9,17 +9,17 @@ public class GUIManager : MonoBehaviour
     public GUISkin m_guiSkin;
     public BaseGUIModule[] m_modules;
 
+    public int ItemHeight = 25;
+    public int ItemPadding = 2;
+
     public int MODULEWIDTH = 200;
     public int PADDING = 20;
 
     public bool m_displayGUI = true;
 
-    public Texture2D m_buttonTexture;
-
     void Start()
     {
         GUIUtility.Init();
-        GUIUtility.ButtonTexture = m_buttonTexture;
 
         foreach (var module in m_modules)
         {
@@ -29,6 +29,13 @@ public class GUIManager : MonoBehaviour
 
     private void OnGUI()
     {
+        GUIUtility.BaseHeight = ItemHeight;
+        GUIUtility.ItemPadding = ItemPadding;
+
+        GUI.color = Color.white;
+
+        GUI.contentColor = Color.white;
+        GUI.backgroundColor = Color.clear;
 
         if (!m_displayGUI)
             return;
@@ -38,15 +45,17 @@ public class GUIManager : MonoBehaviour
 
         foreach (var module in m_modules)
         {
-            if (activeRect.y + module.GetHeight() > Screen.height)
+            if (module.gameObject.activeInHierarchy)
             {
-                activeRect.x += MODULEWIDTH;
-                activeRect.y = PADDING;
-            }
+                if (activeRect.y + module.GetHeight() > Screen.height)
+                {
+                    activeRect.x += MODULEWIDTH;
+                    activeRect.y = PADDING;
+                }
 
-            module.DrawGUI(activeRect);
-            activeRect.y += module.GetHeight();
-           
+                module.DrawGUI(activeRect);
+                activeRect.y += module.GetHeight();
+            }
         }
     }
 

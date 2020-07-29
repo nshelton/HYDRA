@@ -36,47 +36,66 @@ public class LightingModule : BaseGUIModule
         }
 
 
-        m_parameters.Add(new GUIFloat("Exposure", -3, 4, 0,
+        Parameters.Add(new GUIFloat("Exposure", -3, 4, 0,
             delegate (float v) { m_color.postExposure.value = v; }));
 
-        m_parameters.Add(new GUIFloat("Saturation", -100, 100, 0, delegate (float v) 
-        { 
-            m_color.saturation.value = v; 
+        Parameters.Add(new GUIFloat("Saturation", -100, 100, 0, delegate (float v)
+        {
+            m_color.saturation.value = v;
         }));
 
-        m_parameters.Add(new GUIFloat("Ambient", 0, 3, 1, delegate (float v)
+        Parameters.Add(new GUIFloat("Ambient", 0, 3, 1, delegate (float v)
         {
             m_hdri.multiplier.value = v;
             m_gradientSky.multiplier.value = v;
         }));
 
-        m_parameters.Add(new GUIFloat("Directional", 0, 3, 1, delegate (float v)
+        Parameters.Add(new GUIFloat("Directional", 0, 3, 1, delegate (float v)
         {
             m_dirLight.SetIntensity(v);
         }));
 
 
-        m_parameters.Add(new GUIFloat("Time", 0, 2, 1, delegate (float v)
+        Parameters.Add(new GUIFloat("Time", 0, 2, 1, delegate (float v)
         {
             Time.timeScale = v;
         }));
 
-
-        m_parameters.Add(new GUIFloat("Environment", 0, 3, 3, delegate (float v) 
+        foreach (var p in Parameters)
         {
-            if ( v < 1)       {
+            var r = new GUIRow();
+            r.Items.Add(p);
+            GUIRows.Add(r);
+        }
 
-                m_camera.clearColorMode = HDAdditionalCameraData.ClearColorMode.Sky;
-                m_env.skyType.value = 1;
-            } else if (v < 2)  {
+        var row = new GUIRow();
 
-                m_camera.clearColorMode = HDAdditionalCameraData.ClearColorMode.Sky;
-                m_env.skyType.value = 3;
-            }
-            else {
-                m_camera.clearColorMode = HDAdditionalCameraData.ClearColorMode.Color;
-            }
+        Parameters.Add(new GUITrigger("hdri", delegate
+        {
+            m_camera.clearColorMode = HDAdditionalCameraData.ClearColorMode.Sky;
+            m_env.skyType.value = 1;
         }));
-    }   
+
+        row.Items.Add(Parameters[Parameters.Count - 1]);
+
+        Parameters.Add(new GUITrigger("gradientsky", delegate
+        {
+            m_camera.clearColorMode = HDAdditionalCameraData.ClearColorMode.Sky;
+            m_env.skyType.value = 3;
+        }));
+
+        row.Items.Add(Parameters[Parameters.Count - 1]);
+
+        Parameters.Add(new GUITrigger("color", delegate
+        {
+            m_camera.clearColorMode = HDAdditionalCameraData.ClearColorMode.Color;
+        }));
+
+        row.Items.Add(Parameters[Parameters.Count - 1]);
+
+        GUIRows.Add(row);
+        base.Init();
+
+    }
 
 }

@@ -34,30 +34,21 @@ public class PostModule : BaseGUIModule
                     ClampedFloatParameter item = thisVar.GetValue(cast) as ClampedFloatParameter;
                     if (item != null)
                     {
-                        m_parameters.Add(new GUIFloat(effectName + "." + thisVar.Name, item.min, item.max, 0, delegate (float v)
-                        {
-                            item.value = v;
-                        }));
+                        var row = new GUIRow();
+                        var parameter = new GUIFloat(effectName + "." + thisVar.Name,
+                            item.min, item.max, 0, delegate (float v)
+                            {
+                                item.value = v;
+                            });
+                        Parameters.Add(parameter);
+                        row.Items.Add(parameter);
+                        GUIRows.Add(row);
                     }
                 }
-
-               /* if (typeof(T) == typeof(Overlay))
-                {
-                    Overlay ovr = cast as Overlay;
-                    m_triggers.Add(new GUITrigger()
-                    {
-                        effect = delegate {
-                            ovr.gradient.value.colorKeys[0] = new GradientColorKey( UnityEngine.Random.ColorHSV(), 0.0f);
-                        },
-                        name = "ColorSwitch"
-                    });
-                }
-
-                */
+                // add some spacing
+                GUIRows.Add(new GUIRow());
             }
-
         }
-
     }
 
     public override void Init()
@@ -69,6 +60,7 @@ public class PostModule : BaseGUIModule
         AddParameters<Overlay>(m_volume);
         AddParameters<Chroma>(m_volume);
         AddParameters<Mirror>(m_volume);
+        base.Init();
 
     }
 }

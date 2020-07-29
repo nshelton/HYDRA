@@ -32,11 +32,18 @@ public class VFXModule : BaseGUIModule
         {
             if (prop.type == typeof(float))
             {
-                m_parameters.Add(new GUIFloat(prop.name, 0, 1, 0, delegate (float v)
-             {
-                 m_effect.SetFloat(prop.name, v);
-             }));
+                var row = new GUIRow();
+                var p = new GUIFloat(prop.name, 0, 1, 0, delegate (float v)
+                {
+                    m_effect.SetFloat(prop.name, v);
+                });
+                row.Items.Add(p);
+                Parameters.Add(p);
+                GUIRows.Add(row);
             }
         }
+
+        base.Init();
+
     }
 }

@@ -5,29 +5,41 @@ using UnityEngine;
 public class GUIUtility 
 {
 
-    public static CustomSlider ActiveControl;
+    public static float BaseHeight = 25;
+    public static float ItemPadding = 2;
 
-    public static Texture2D LightGrayTexture;
+    public static GUIBase ActiveControl;
+
+    public static Texture2D WhiteTexture;
     public static Texture2D GrayTexture;
 
+    public static Texture2D GreenTexture;
+    public static Texture2D OrangeTexture;
 
-    public static Texture2D ButtonTexture;
-
+    public static float OverlayAlpha = 0.7f;
+    public static Color OscillatorRoutingColor = new Color(1.0f, 0.5f, 0.0f);
+    public static Color AudioRoutingColor = new Color(0.5f, 1.0f, 0.0f);
+    
     public static void Init()
     {
-        LightGrayTexture = new Texture2D(2, 2, UnityEngine.Experimental.Rendering.DefaultFormat.LDR, UnityEngine.Experimental.Rendering.TextureCreationFlags.None);
+        WhiteTexture = new Texture2D(2, 2, UnityEngine.Experimental.Rendering.DefaultFormat.LDR, UnityEngine.Experimental.Rendering.TextureCreationFlags.None);
         GrayTexture = new Texture2D(2, 2, UnityEngine.Experimental.Rendering.DefaultFormat.LDR, UnityEngine.Experimental.Rendering.TextureCreationFlags.None);
-
+        GreenTexture = new Texture2D(2, 2, UnityEngine.Experimental.Rendering.DefaultFormat.LDR, UnityEngine.Experimental.Rendering.TextureCreationFlags.None);
+        OrangeTexture = new Texture2D(2, 2, UnityEngine.Experimental.Rendering.DefaultFormat.LDR, UnityEngine.Experimental.Rendering.TextureCreationFlags.None);
         for (int i = 0; i < 2; i++)
         {
             for (int j = 0; j < 2; j++)
             {
-                LightGrayTexture.SetPixel(i, j, new Color(1f, 1f, 1f, 0.5f));
-                GrayTexture.SetPixel(i, j, new Color(0.5f, 0.5f, 0.5f, 0.5f));
+                WhiteTexture.SetPixel(i, j, new Color(1f, 1f, 1f, 0.2f));
+                GrayTexture.SetPixel(i, j, new Color(0.5f, 0.5f, 0.5f, 1f));
+                GreenTexture.SetPixel(i, j, new Color(0.0f, 1.0f, 0.0f, 0.5f));
+                OrangeTexture.SetPixel(i, j, new Color(1.0f, 0.5f, 0.5f, 1f));
             }
         }
         GrayTexture.Apply();
-        LightGrayTexture.Apply();
+        WhiteTexture.Apply();
+        GreenTexture.Apply();
+        OrangeTexture.Apply();
     }
 
 }

@@ -18,6 +18,7 @@ public class AudioModule : BaseGUIModule
     int m_textureOffset = 0;
 
     public override string Name() { return "audio"; }
+    public override bool ShowMacros() { return false; }
 
     public override void Init()
     {
@@ -28,15 +29,19 @@ public class AudioModule : BaseGUIModule
 
         m_beatTexture = new Texture2D(256, 64, UnityEngine.Experimental.Rendering.DefaultFormat.LDR, UnityEngine.Experimental.Rendering.TextureCreationFlags.None);
         m_levelTexture = new Texture2D(256, 64, UnityEngine.Experimental.Rendering.DefaultFormat.LDR, UnityEngine.Experimental.Rendering.TextureCreationFlags.None);
-      
-        m_parameters.Add(new GUIFloat("dynamic range", 1f, 50f, 25f, delegate( float v )
+
+        var row = new GUIRow();
+        row.Items.Add(new GUIFloat("dynamic range", 1f, 50f, 25f, delegate( float v )
         { 
                 m_level.dynamicRange = v;
                 m_analyzer.dynamicRange = v; 
         }));
 
+        GUIRows.Add(row);
+        base.Init();
 
     }
+
     public override void Update()
     {
         for (int i = 0; i < 64; i++)
@@ -73,10 +78,10 @@ public class AudioModule : BaseGUIModule
     public override void DrawGUI(Rect area)
     {
         var itemRect = new Rect(
-                 area.x + ITEMPADDING,
-                 area.y + ITEMPADDING,
-                 area.width - ITEMPADDING * 2,
-                 ITEMHEIGHT - ITEMPADDING * 2);
+                 area.x + GUIUtility.ItemPadding,
+                 area.y + GUIUtility.ItemPadding,
+                 area.width - GUIUtility.ItemPadding * 2,
+                 GUIUtility.BaseHeight - GUIUtility.ItemPadding * 2);
 
         var oldBG = GUI.backgroundColor;
         GUI.backgroundColor = Color.clear;
@@ -85,33 +90,33 @@ public class AudioModule : BaseGUIModule
             m_hidden = !m_hidden;
         }
         GUI.backgroundColor = oldBG;
-        itemRect.y += ITEMHEIGHT;
+        itemRect.y += GUIUtility.BaseHeight;
 
         if (m_hidden)
             return;
         
-        foreach (var slider in m_parameters)
+        foreach (var row in GUIRows)
         {
-            slider.DrawGUI(itemRect);
-            itemRect.y += ITEMHEIGHT;
+            row.DrawGUI(itemRect);
+            itemRect.y += GUIUtility.BaseHeight;
         }
 
         GUI.DrawTexture(itemRect, m_levelTexture);
-        itemRect.y += ITEMHEIGHT;
+        itemRect.y += GUIUtility.BaseHeight;
 
         GUI.DrawTexture(itemRect, m_beatTexture);
-        itemRect.y += ITEMHEIGHT;
+        itemRect.y += GUIUtility.BaseHeight;
 
         GUI.DrawTexture(itemRect, m_spectrum.texture);
-        itemRect.y += ITEMHEIGHT;
+        itemRect.y += GUIUtility.BaseHeight;
         itemRect.width /= 4;
-        GUI.DrawTexture(itemRect, (m_beatDetect.GetBeat(8) > 0.9) ? GUIUtility.LightGrayTexture : GUIUtility.GrayTexture);
+        GUI.DrawTexture(itemRect, (m_beatDetect.GetBeat(8) > 0.9) ? GUIUtility.WhiteTexture : GUIUtility.GrayTexture);
         itemRect.x += itemRect.width;
-        GUI.DrawTexture(itemRect, (m_beatDetect.GetBeat(4) > 0.9) ? GUIUtility.LightGrayTexture : GUIUtility.GrayTexture);
+        GUI.DrawTexture(itemRect, (m_beatDetect.GetBeat(4) > 0.9) ? GUIUtility.WhiteTexture : GUIUtility.GrayTexture);
         itemRect.x += itemRect.width;
-        GUI.DrawTexture(itemRect, (m_beatDetect.GetBeat(2) > 0.9) ? GUIUtility.LightGrayTexture : GUIUtility.GrayTexture);
+        GUI.DrawTexture(itemRect, (m_beatDetect.GetBeat(2) > 0.9) ? GUIUtility.WhiteTexture : GUIUtility.GrayTexture);
         itemRect.x += itemRect.width;
-        GUI.DrawTexture(itemRect, (m_beatDetect.GetBeat(1) > 0.9) ? GUIUtility.LightGrayTexture : GUIUtility.GrayTexture);
+        GUI.DrawTexture(itemRect, (m_beatDetect.GetBeat(1) > 0.9) ? GUIUtility.WhiteTexture : GUIUtility.GrayTexture);
         itemRect.x += itemRect.width;
     }
 

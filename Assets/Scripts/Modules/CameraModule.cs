@@ -20,13 +20,12 @@ public class CameraModule : BaseGUIModule
     public override void Init()
     {
 
-        m_parameters.Add(new GUIFloat("fov", 25, 120, 80, delegate(float v)
+        Parameters.Add(new GUIFloat("fov", 25, 120, 80, delegate(float v)
         {
             m_camera.fieldOfView = v;
         }));
 
-
-        m_parameters.Add(new GUIFloat("offset", 0, 10, 2, delegate (float v) 
+        Parameters.Add(new GUIFloat("offset", 0, 10, 2, delegate (float v) 
         {
             foreach (var off in m_zOffsetTransforms)
             {
@@ -34,34 +33,48 @@ public class CameraModule : BaseGUIModule
             }
         }));
 
-        m_parameters.Add(new GUIFloat("Intensity", 0, 1, 0.5f, delegate(float v)
+        Parameters.Add(new GUIFloat("Intensity", 0, 1, 0.5f, delegate(float v)
         {
                 m_linear.angularVelocity = Vector3.up * v * 90f;
                 m_brownian.rotationAmount = new Vector3(90, 180, 90) * v;
         }));
 
-        m_triggers.Add(new GUITrigger()
+        foreach (var p in Parameters)
         {
-            name = "Reset",
-            effect = delegate { m_follow.target = m_transforms[0]; },
-        });
+            var r = new GUIRow();
+            r.Items.Add(p);
+            GUIRows.Add(r);
+        }
 
-        m_triggers.Add(new GUITrigger()
-        {
-            name = "Noise",
-            effect = delegate { m_follow.target = m_transforms[1]; },
-        });
+        var row = new GUIRow();
 
-        m_triggers.Add(new GUITrigger()
-        {
-            name = "spinner",
-            effect = delegate { m_follow.target = m_transforms[2]; },
-        });
+        Parameters.Add( new GUITrigger( "Reset", delegate { 
+            m_follow.target = m_transforms[0]; 
+        }));
 
-        m_triggers.Add(new GUITrigger()
-        {
-            name = "jump", effect = delegate { m_cameraJump.Jump(); },
-        });
+        row.Items.Add(Parameters[Parameters.Count - 1]);
+
+        Parameters.Add(new GUITrigger("Noise", delegate {
+            m_follow.target = m_transforms[1];
+        }));
+
+        row.Items.Add(Parameters[Parameters.Count - 1]);
+
+        Parameters.Add(new GUITrigger("spinner", delegate {
+            m_follow.target = m_transforms[2];
+        }));
+
+        row.Items.Add(Parameters[Parameters.Count - 1]);
+
+        Parameters.Add(new GUITrigger("jump", delegate {
+            m_cameraJump.Jump();
+        }));
+
+        row.Items.Add(Parameters[Parameters.Count - 1]);
+
+        GUIRows.Add(row);
+
+        base.Init();
     }
      
     
