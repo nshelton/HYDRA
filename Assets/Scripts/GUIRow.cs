@@ -5,7 +5,6 @@ using UnityEngine;
 
 public class GUIRow 
 {
- 
     public List<GUIBase> Items = new List<GUIBase>();
 
     public void Update()
@@ -26,7 +25,7 @@ public class GUIRow
         {
             return GUIUtility.BaseHeight;
         }
-        else if (Items[0] is GUIToggle || Items[0] is GUITrigger)
+        else if (Items[0] is GUIToggle || Items[0] is GUITrigger || Items[0] is GUITexture)
         {
             return GUIUtility.BaseHeight * 1f;
         }
@@ -50,3 +49,4 @@ public class GUIRow
         }
     }
 }
+

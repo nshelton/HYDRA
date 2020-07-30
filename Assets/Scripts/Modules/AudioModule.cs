@@ -37,6 +37,9 @@ public class AudioModule : BaseGUIModule
                 m_analyzer.dynamicRange = v; 
         }));
 
+        row.Items.Add(new GUITexture(m_beatTexture));
+        row.Items.Add(new GUITexture(m_levelTexture));
+
         GUIRows.Add(row);
         base.Init();
 
@@ -73,52 +76,10 @@ public class AudioModule : BaseGUIModule
         }
         m_levelTexture.Apply();
         m_textureOffset++;
+        base.Update();
     }
 
-    public override void DrawGUI(Rect area)
-    {
-        var itemRect = new Rect(
-                 area.x + GUIUtility.ItemPadding,
-                 area.y + GUIUtility.ItemPadding,
-                 area.width - GUIUtility.ItemPadding * 2,
-                 GUIUtility.BaseHeight - GUIUtility.ItemPadding * 2);
-
-        var oldBG = GUI.backgroundColor;
-        GUI.backgroundColor = Color.clear;
-        if (GUI.Button(itemRect, Name()))
-        {
-            m_hidden = !m_hidden;
-        }
-        GUI.backgroundColor = oldBG;
-        itemRect.y += GUIUtility.BaseHeight;
-
-        if (m_hidden)
-            return;
-        
-        foreach (var row in GUIRows)
-        {
-            row.DrawGUI(itemRect);
-            itemRect.y += GUIUtility.BaseHeight;
-        }
-
-        GUI.DrawTexture(itemRect, m_levelTexture);
-        itemRect.y += GUIUtility.BaseHeight;
-
-        GUI.DrawTexture(itemRect, m_beatTexture);
-        itemRect.y += GUIUtility.BaseHeight;
-
-        GUI.DrawTexture(itemRect, m_spectrum.texture);
-        itemRect.y += GUIUtility.BaseHeight;
-        itemRect.width /= 4;
-        GUI.DrawTexture(itemRect, (m_beatDetect.GetBeat(8) > 0.9) ? GUIUtility.WhiteTexture : GUIUtility.GrayTexture);
-        itemRect.x += itemRect.width;
-        GUI.DrawTexture(itemRect, (m_beatDetect.GetBeat(4) > 0.9) ? GUIUtility.WhiteTexture : GUIUtility.GrayTexture);
-        itemRect.x += itemRect.width;
-        GUI.DrawTexture(itemRect, (m_beatDetect.GetBeat(2) > 0.9) ? GUIUtility.WhiteTexture : GUIUtility.GrayTexture);
-        itemRect.x += itemRect.width;
-        GUI.DrawTexture(itemRect, (m_beatDetect.GetBeat(1) > 0.9) ? GUIUtility.WhiteTexture : GUIUtility.GrayTexture);
-        itemRect.x += itemRect.width;
-    }
+ 
 
 
 }

@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditorInternal;
 using UnityEngine;
 
-
-
-[System.Serializable]
+ 
 public class GUITrigger : GUIBase
 {
-    private CustomButton Button;
+    protected CustomButton Button;
 
     public GUITrigger(string name, Action effectL, Action effectR)
     {
@@ -32,8 +31,7 @@ public class GUITrigger : GUIBase
         base.Update();
     }
 }
-
-[System.Serializable]
+ 
 public class GUIToggle : GUIBase
 {
     bool Enabled;
@@ -68,17 +66,14 @@ public class CustomButton
 
     Action actionLeft;
     Action actionRight;
-    //Action<float> leftClickAction;
 
     string name;
-    private bool lastLeftDown = false;
 
     public CustomButton(string name, Action actionLeft, Action actionRight)
     {
         this.actionLeft = actionLeft;
         this.actionRight = actionRight;
         this.name = name;
-
     }
 
     Rect currentRect = new Rect();
@@ -106,5 +101,41 @@ public class CustomButton
         GUI.Label(area, name );
 
         GUI.DrawTexture(area, enabled ? GUIUtility.GreenTexture : GUIUtility.WhiteTexture );
+    }
+
+    public void DrawGUI(Rect area, Texture2D texture)
+    {
+        currentRect = area;
+        GUI.Label(area, name);
+        GUI.DrawTexture(area, texture);
+    }
+}
+
+
+public class GUIMacroTrigger : GUITrigger
+{
+    public bool Assigned = false;
+    public bool Active = false;
+
+    public GUIMacroTrigger(string name, Action effectL, Action effectR) :
+        base(name, effectL, effectR)
+    {
+    }
+
+    public override void DrawGUI(Rect buttonRect)
+    {
+        var texture = GUIUtility.GrayTexture;
+
+        if (Active)
+        {
+            texture = GUIUtility.GreenTexture;
+        }
+        else if (Assigned)
+        {
+            texture = GUIUtility.WhiteTexture;
+        }
+
+        Button.DrawGUI(buttonRect, texture);
+
     }
 }

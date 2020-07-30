@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine; 
+using UnityEngine;
+using static MacroDatabase;
 
 public abstract class BaseGUIModule : MonoBehaviour
 {
@@ -9,12 +10,11 @@ public abstract class BaseGUIModule : MonoBehaviour
 
     public List<GUIRow> GUIRows = new List<GUIRow>();
 
-
     public List<GUIBase> Parameters = new List<GUIBase>();
     private Dictionary<string, GUIBase> parameterNameMap = new Dictionary<string, GUIBase>();
 
-
-    private Dictionary<string, string> MacroNameToStateMap = new Dictionary<string, string>();
+    private Dictionary<string, Macro> MacroNameToStateMap = new Dictionary<string, Macro>();
+    private Dictionary<string, GUIMacroTrigger> MacroNameToButtonMap = new Dictionary<string, GUIMacroTrigger>();
 
     public string GetState()
     {
@@ -49,6 +49,7 @@ public abstract class BaseGUIModule : MonoBehaviour
                 if (parameterNameMap.ContainsKey(name))
                 {
                     parameterNameMap[name].SetFromFieldsString(data);
+
                 }
                 else
                 {
@@ -60,52 +61,94 @@ public abstract class BaseGUIModule : MonoBehaviour
 
     public virtual bool ShowMacros() { return true; }
 
-    public void SaveMacro(int i)
+    public void SaveMacro(string name)
     {
-        MacroNameToStateMap[i.ToString()] = GetState();
+       
+        var state = GetState();
+        MacroNameToStateMap[name].Data = state;
+        MacroNameToButtonMap[name].Assigned = true;
+        MacroDatabase.SaveMacro(Name(), name, state);
     }
 
-    public void SetMacro(int i)
+    public Dictionary<string, Macro> LoadMacroData()
     {
-        if ( i == 0) {
-            foreach (GUIBase parameter in Parameters)
-            {
-                parameter.ResetToDefault();
-            }
-        } 
-        else
+        Dictionary<string, Macro> macros = new Dictionary<string, Macro>();
+
+        for(int i = 0; i < 5; i ++)
         {
-            var macroName = i.ToString();
-            if (MacroNameToStateMap.ContainsKey(macroName))
+            macros[i.ToString()] = TryGetMacro(Name(), i.ToString());
+        }
+
+        return macros;
+    }
+
+
+    public void SetMacro(string name)
+    {
+        if (MacroNameToStateMap.ContainsKey(name))
+        {
+            var m = MacroNameToStateMap[name];
+            if (m.Data != String.Empty)
             {
-                SetState(MacroNameToStateMap[i.ToString()]);
-            } else
+                Debug.Log("SET" + m.Data);
+                SetState(m.Data);
+            }
+            else
             {
-                Debug.LogError($"Cound not find macro {macroName}");
+                foreach (GUIBase parameter in Parameters)
+                {
+                    parameter.ResetToDefault();
+                }
             }
         }
+        else
+        {
+            Debug.LogError($"Cound not find macro {name}");
+            return;
+        }
+
+        foreach( var m in MacroNameToButtonMap)
+        {
+            m.Value.Active = false;
+        }
+
+        MacroNameToButtonMap[name].Active = true;
     }
 
-    GUITrigger createMacroButton(int i)
+
+    void SetupMacros()
     {
-        return  new GUITrigger(i.ToString(),
-            delegate { this.SetMacro(i); },
-            delegate { this.SaveMacro(i); }
+        MacroNameToStateMap = LoadMacroData();
+
+        GUIRow macroRow = new GUIRow();
+
+        foreach(var m in MacroNameToStateMap)
+        {
+            var macroButton = createMacroButton(m.Value);
+            MacroNameToButtonMap[m.Value.Name] = macroButton;
+            macroRow.Items.Add(macroButton);
+        }
+
+        GUIRows.Insert(0, macroRow);
+
+    }
+    GUIMacroTrigger createMacroButton(Macro m)
+    {
+        var trigger = new GUIMacroTrigger(m.Name,
+            delegate { this.SetMacro(m.Name); },
+            delegate { this.SaveMacro(m.Name); }
         );
+
+        trigger.Assigned = m.Data != String.Empty;
+
+        return trigger;
     }
 
     public virtual void Init()
     {
         if (ShowMacros())
         {
-            var macroRow = new GUIRow();
-
-            macroRow.Items.Add(createMacroButton(0));
-            macroRow.Items.Add(createMacroButton(1));
-            macroRow.Items.Add(createMacroButton(2));
-            macroRow.Items.Add(createMacroButton(3));
-
-            GUIRows.Insert(0, macroRow);
+            SetupMacros();
 
         }
 
@@ -139,16 +182,14 @@ public abstract class BaseGUIModule : MonoBehaviour
 
     public virtual void Update()
     {
-        foreach (var row in GUIRows)
+        for (int i = 0; i < GUIRows.Count; i++)
         {
-            row.Update();
+            GUIRows[i].Update();
         }
     }
 
     public virtual void DrawGUI(Rect area)
     {
- 
-      
         var rowRect = new Rect(
             area.x,
             area.y + GUIUtility.BaseHeight * 3,
