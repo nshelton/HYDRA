@@ -180,11 +180,33 @@ public abstract class BaseGUIModule : MonoBehaviour
         return height;
     }
 
-    public virtual void Update()
+
+    public virtual void ManagerUpdate()
     {
         for (int i = 0; i < GUIRows.Count; i++)
         {
             GUIRows[i].Update();
+        }
+    }
+
+    public virtual void UIUpdate()
+    {
+        if (!m_hidden)
+        {
+            for (int i = 0; i < GUIRows.Count; i++)
+            {
+                GUIRows[i].UIUpdate();
+            }
+        }
+        else
+        {
+            // if hidden still update title row and macro row
+            GUIRows[0].UIUpdate();
+
+            if (ShowMacros())
+            {
+                GUIRows[1].UIUpdate();
+            }
         }
     }
 
@@ -208,4 +230,7 @@ public abstract class BaseGUIModule : MonoBehaviour
             rowRect.y += rowRect.height;
         }
     }
+
+    public virtual void Update() { }// Dont implement Monobehaviour update, update should be controlled by manager
+
 }

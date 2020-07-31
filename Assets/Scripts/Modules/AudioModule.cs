@@ -36,11 +36,18 @@ public class AudioModule : BaseGUIModule
                 m_level.dynamicRange = v;
                 m_analyzer.dynamicRange = v; 
         }));
+        GUIRows.Add(row);
+
+        row = new GUIRow();
 
         row.Items.Add(new GUITexture(m_beatTexture));
-        row.Items.Add(new GUITexture(m_levelTexture));
-
         GUIRows.Add(row);
+
+        row = new GUIRow();
+
+        row.Items.Add(new GUITexture(m_levelTexture));
+        GUIRows.Add(row);
+
         base.Init();
 
     }
@@ -76,10 +83,5 @@ public class AudioModule : BaseGUIModule
         }
         m_levelTexture.Apply();
         m_textureOffset++;
-        base.Update();
     }
-
- 
-
-
 }

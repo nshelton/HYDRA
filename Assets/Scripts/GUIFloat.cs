@@ -12,7 +12,7 @@ public class GUIFloat : GUIBase
     public float defaultValue;
 
     private bool isActive = false;
-    Rect currentRect = new Rect();
+    public Rect currentRect = new Rect();
 
     public GUIFloat(string name, float min, float max, float value, Action<float> effect)
     {
@@ -29,8 +29,34 @@ public class GUIFloat : GUIBase
         value = defaultValue;
         routingType = RoutingType.None;
     }
-
     public override void Update()
+    {
+        // handle routing
+        if (routingType == RoutingType.None)
+            return;
+
+        float newVal = 0;
+        switch (routingType)
+        {
+            case RoutingType.AudioBypass:
+                newVal = RoutingServer.SampleBypass();
+                break;
+            case RoutingType.AudioHigh:
+                newVal = RoutingServer.SampleTreble();
+                break;
+            case RoutingType.AudioLow:
+                newVal = RoutingServer.SampleBass();
+                break;
+            case RoutingType.Oscillator:
+                newVal = RoutingServer.SampleOscillator(oscillatorType, oscillatorFrequency);
+                break;
+        }
+
+        newVal = min + newVal * (max - min);
+        value = Mathf.Lerp(value, newVal, lerp);
+    }
+
+    public override void UIUpdate()
     {
         ///Handle inputs
         Vector2 mouse = Input.mousePosition;
@@ -61,33 +87,10 @@ public class GUIFloat : GUIBase
             }
             if (Input.GetMouseButtonDown(1))
             {
-                ShowRoutingModal = true;
+                GUIUtility.ActiveControl = this;
+                GUIUtility.ControlModal = this;
             }
         }
-
-        // handle routing
-        if (routingType == RoutingType.None)
-            return;
-
-        float newVal = 0;
-        switch (routingType)
-        {
-            case RoutingType.AudioBypass:
-                newVal = RoutingServer.SampleBypass();
-                break;
-            case RoutingType.AudioHigh:
-                newVal = RoutingServer.SampleTreble();
-                break;
-            case RoutingType.AudioLow:
-                newVal = RoutingServer.SampleBass();
-                break;
-            case RoutingType.Oscillator:
-                newVal = RoutingServer.SampleOscillator(oscillatorType, oscillatorFrequency);
-                break;
-        }
-
-        newVal = min + newVal * (max - min);
-        value = Mathf.Lerp(value, newVal, lerp);
     }
 
     public override void DrawGUI(Rect sliderRect)

@@ -27,8 +27,13 @@ public class GUITrigger : GUIBase
     }
     public override void Update()
     {
-        Button.Update();
         base.Update();
+    }
+
+    public override void UIUpdate()
+    {
+        Button.Update();
+        base.UIUpdate();
     }
 }
  
@@ -56,8 +61,13 @@ public class GUIToggle : GUIBase
 
     public override void Update()
     {
-        Button.Update();
         base.Update();
+    }
+
+    public override void UIUpdate()
+    {
+        Button.Update();
+        base.UIUpdate();
     }
 }
 
@@ -68,6 +78,7 @@ public class CustomButton
     Action actionRight;
 
     string name;
+    Rect currentRect = new Rect();
 
     public CustomButton(string name, Action actionLeft, Action actionRight)
     {
@@ -76,7 +87,6 @@ public class CustomButton
         this.name = name;
     }
 
-    Rect currentRect = new Rect();
     public void Update()
     {
         Vector2 mouse = Input.mousePosition;
@@ -84,11 +94,11 @@ public class CustomButton
 
         if (currentRect.Contains(mouse))
         {
-            if (Input.GetMouseButtonUp(0))
+            if (Input.GetMouseButtonDown(0))
             {
                 actionLeft();
             }
-            if (Input.GetMouseButtonUp(1) && actionRight != null)
+            if (Input.GetMouseButtonDown(1) && actionRight != null)
             {
                 actionRight();
             }
@@ -99,7 +109,6 @@ public class CustomButton
     {
         currentRect = area;
         GUI.Label(area, name );
-
         GUI.DrawTexture(area, enabled ? GUIUtility.GreenTexture : GUIUtility.WhiteTexture );
     }
 
@@ -136,6 +145,5 @@ public class GUIMacroTrigger : GUITrigger
         }
 
         Button.DrawGUI(buttonRect, texture);
-
     }
 }

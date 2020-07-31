@@ -20,6 +20,7 @@ public class GUIManager : MonoBehaviour
     void Start()
     {
         GUIUtility.Init();
+        RoutingModal.Init();
 
         foreach (var module in m_modules)
         {
@@ -57,13 +58,38 @@ public class GUIManager : MonoBehaviour
                 activeRect.y += module.GetHeight();
             }
         }
+
+        if (GUIUtility.ControlModal != null)
+        {
+
+            RoutingModal.DrawGUI();
+        }
     }
 
     void Update()
     {
+
+        if (GUIUtility.ControlModal != null)
+        {
+
+            RoutingModal.Update();
+            RoutingModal.UIUpdate();
+        }
+
+        foreach (var module in m_modules)
+        {
+        module.ManagerUpdate();
+
+        if ( GUIUtility.ControlModal == null)
+        {
+            module.UIUpdate();
+        }
+        }
+
         if ( Input.GetKeyDown(KeyCode.Escape))
         {
             m_displayGUI = !m_displayGUI;
         }
+
     }
 }

@@ -14,6 +14,13 @@ public class GUIRow
             Items[i].Update();
         }    
     }
+    public void UIUpdate()
+    {
+        for (int i = 0; i < Items.Count; i++)
+        {
+            Items[i].UIUpdate();
+        }
+    }
 
     public float GetHeight()
     {

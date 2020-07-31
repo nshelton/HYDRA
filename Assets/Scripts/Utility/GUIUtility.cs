@@ -20,7 +20,9 @@ public class GUIUtility
     public static float OverlayAlpha = 0.7f;
     public static Color OscillatorRoutingColor = new Color(1.0f, 0.5f, 0.0f);
     public static Color AudioRoutingColor = new Color(1.0f, 0.5f, 0.0f);
-    
+
+    public static GUIBase ControlModal;
+
     public static void Init()
     {
         ClearTexture = new Texture2D(2, 2, UnityEngine.Experimental.Rendering.DefaultFormat.LDR, UnityEngine.Experimental.Rendering.TextureCreationFlags.None);
