@@ -1,13 +1,5 @@
-﻿using Kino.PostProcessing;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Runtime.InteropServices;
-using System.Security.Permissions;
-using UnityEngine;
-using UnityEngine.Rendering;
+﻿using System.Collections.Generic;
 using UnityEngine.VFX;
-using UnityEngine.VFX.Utility;
 
 public class VFXModule : BaseGUIModule
 {
@@ -19,7 +11,6 @@ public class VFXModule : BaseGUIModule
 
     public override void Init()
     {
-
         m_effect = GetComponent<VisualEffect>();
 
         m_name = "VFX." + m_effect.name;

@@ -33,7 +33,7 @@ public class CameraModule : BaseGUIModule
             }
         }));
 
-        Parameters.Add(new GUIFloat("Intensity", 0, 1, 0.5f, delegate(float v)
+        Parameters.Add(new GUIFloat("Intensity", 0, 0.3f, 0.1f, delegate(float v)
         {
                 m_linear.angularVelocity = Vector3.up * v * 90f;
                 m_brownian.rotationAmount = new Vector3(90, 180, 90) * v;

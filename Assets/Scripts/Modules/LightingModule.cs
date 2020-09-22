@@ -2,57 +2,68 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
-using UnityEngine.Rendering.HighDefinition;
-
+using UnityEngine.Rendering.PostProcessing;
 
 public class LightingModule : BaseGUIModule
 {
-    public HDAdditionalLightData m_dirLight;
-    public HDAdditionalCameraData m_camera;
-    public VolumeProfile m_volume;
-    public ColorAdjustments m_color;
 
-    private GradientSky m_gradientSky;
-    private HDRISky m_hdri;
-    private VisualEnvironment m_env;
+    public Light m_dirLight;
+    public PostProcessProfile m_profile;
+
+    public Material m_gradientSkybox;
+    public Material m_hdriSkybox;
+
+    public Cubemap m_hdri;
+    public Cubemap m_gradient;
+    
+
+    private ColorGrading m_colorGrade;
+    private AmbientOcclusion m_ao;
+    private Bloom m_bloom;
+    private Grain m_grain;
+    private Camera m_camera;
 
     public override string Name() { return "lighting"; }
 
     public override void Init()
     {
-        m_camera = Camera.main.GetComponent<HDAdditionalCameraData>();
+        m_camera = Camera.main;
 
-        foreach (var component in m_volume.components)
-        {
-            if (component is GradientSky)
-                m_gradientSky = component as GradientSky;
-            if (component is VisualEnvironment)
-                m_env = component as VisualEnvironment;
-            if (component is HDRISky)
-                m_hdri = component as HDRISky;
-            if (component is ColorAdjustments)
-                m_color = component as ColorAdjustments;
-
-        }
+        m_profile = GetComponent<PostProcessVolume>().profile;
+        m_colorGrade = m_profile.GetSetting<ColorGrading>();
+        m_ao = m_profile.GetSetting<AmbientOcclusion>();
+        m_bloom = m_profile.GetSetting<Bloom>();
+        m_grain = m_profile.GetSetting<Grain>();
 
 
         Parameters.Add(new GUIFloat("Exposure", -3, 4, 0,
-            delegate (float v) { m_color.postExposure.value = v; }));
+             delegate (float v) { m_colorGrade.postExposure.value = v; }));
 
-        Parameters.Add(new GUIFloat("Saturation", -100, 100, 0, delegate (float v)
-        {
-            m_color.saturation.value = v;
-        }));
+        Parameters.Add(new GUIFloat("Contrast", -100, 100, 0,
+            delegate (float v) { m_colorGrade.contrast.value = v; }));
+        
+        Parameters.Add(new GUIFloat("Saturation", -100, 100, 0,
+            delegate (float v) { m_colorGrade.saturation.value = v; }));
+
+        Parameters.Add(new GUIFloat("ao", 0, 2, 0.5f,
+          delegate (float v) { m_ao.intensity.value = v; }));
+
+        Parameters.Add(new GUIFloat("bloom", 0, 2, 0,
+            delegate (float v) { m_bloom.intensity.value = v; }));
+
+        Parameters.Add(new GUIFloat("grain", 0, 1, 0,
+            delegate (float v) { m_grain.intensity.value = v; }));
 
         Parameters.Add(new GUIFloat("Ambient", 0, 3, 1, delegate (float v)
         {
-            m_hdri.multiplier.value = v;
-            m_gradientSky.multiplier.value = v;
+            RenderSettings.ambientMode = AmbientMode.Flat;
+            RenderSettings.ambientLight = Color.white * v;
+
         }));
 
         Parameters.Add(new GUIFloat("Directional", 0, 3, 1, delegate (float v)
         {
-            m_dirLight.SetIntensity(v);
+            m_dirLight.intensity = v;
         }));
 
 
@@ -61,41 +72,47 @@ public class LightingModule : BaseGUIModule
             Time.timeScale = v;
         }));
 
+
         foreach (var p in Parameters)
         {
             var r = new GUIRow();
             r.Items.Add(p);
             GUIRows.Add(r);
         }
-
+  
         var row = new GUIRow();
 
         Parameters.Add(new GUITrigger("hdri", delegate
         {
-            m_camera.clearColorMode = HDAdditionalCameraData.ClearColorMode.Sky;
-            m_env.skyType.value = 1;
+            RenderSettings.defaultReflectionMode = DefaultReflectionMode.Custom;
+            RenderSettings.customReflection = m_hdri;
+            m_camera.clearFlags = CameraClearFlags.Skybox;
+            RenderSettings.skybox = m_hdriSkybox;
         }));
 
         row.Items.Add(Parameters[Parameters.Count - 1]);
 
         Parameters.Add(new GUITrigger("gradientsky", delegate
         {
-            m_camera.clearColorMode = HDAdditionalCameraData.ClearColorMode.Sky;
-            m_env.skyType.value = 3;
+            RenderSettings.defaultReflectionMode = DefaultReflectionMode.Custom;
+            RenderSettings.customReflection = m_gradient;
+            m_camera.clearFlags = CameraClearFlags.Skybox;
+            RenderSettings.skybox = m_gradientSkybox;
         }));
 
         row.Items.Add(Parameters[Parameters.Count - 1]);
 
         Parameters.Add(new GUITrigger("color", delegate
         {
-            m_camera.clearColorMode = HDAdditionalCameraData.ClearColorMode.Color;
+            m_camera.clearFlags = CameraClearFlags.SolidColor;
+            m_camera.backgroundColor = Color.white * 0.1f;
+
         }));
 
         row.Items.Add(Parameters[Parameters.Count - 1]);
 
         GUIRows.Add(row);
+          
         base.Init();
-
     }
-
 }

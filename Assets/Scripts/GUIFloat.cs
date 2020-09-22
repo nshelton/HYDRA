@@ -8,6 +8,7 @@ public class GUIFloat : GUIBase
     public Action<float> effect;
     public float min = 0;
     public float max = 1;
+    public float lerpedValue;
     public float value;
     public float defaultValue;
 
@@ -52,6 +53,7 @@ public class GUIFloat : GUIBase
                 break;
         }
 
+        newVal = Mathf.Pow(newVal, power);
         newVal = min + newVal * (max - min);
         value = Mathf.Lerp(value, newVal, lerp);
     }
@@ -87,8 +89,7 @@ public class GUIFloat : GUIBase
             }
             if (Input.GetMouseButtonDown(1))
             {
-                GUIUtility.ActiveControl = this;
-                GUIUtility.ControlModal = this;
+                RoutingModal.SetTarget(this);
             }
         }
     }

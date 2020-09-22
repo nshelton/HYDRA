@@ -1,28 +1,17 @@
-﻿using Kino.PostProcessing;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Rendering;
-using UnityEngine.Rendering.HighDefinition;
+using UnityEngine.Rendering.PostProcessing;
 
 public class PostModule : BaseGUIModule
 {
 
-    private VolumeProfile m_volume;
-    public Gradient m_randomGradient;
+    private PostProcessProfile m_profile;
 
     public override string Name() { return "postfx"; }
 
-    private void RandomizeGradient()
+    private void AddParameters<T>(PostProcessProfile profile) where T : PostProcessEffectSettings
     {
-        m_randomGradient.colorKeys[0].color.r = UnityEngine.Random.value;
-        m_randomGradient.colorKeys[1].color.r = UnityEngine.Random.value;
-    }
-
-    private void AddParameters<T>(VolumeProfile volume) where T : VolumeComponent
-    {
-        foreach (var effect in volume.components)
+        foreach (var effect in profile.settings)
         {
             var effectName = effect.GetType().Name;
             var cast = effect as T;
@@ -31,12 +20,12 @@ public class PostModule : BaseGUIModule
             {
                 foreach (var thisVar in cast.GetType().GetFields())
                 {
-                    ClampedFloatParameter item = thisVar.GetValue(cast) as ClampedFloatParameter;
+                    UnityEngine.Rendering.PostProcessing.FloatParameter item = thisVar.GetValue(cast) as UnityEngine.Rendering.PostProcessing.FloatParameter;
                     if (item != null)
                     {
                         var row = new GUIRow();
                         var parameter = new GUIFloat(effectName + "." + thisVar.Name,
-                            item.min, item.max, 0, delegate (float v)
+                            0, 1, 0, delegate (float v)
                             {
                                 item.value = v;
                             });
@@ -53,13 +42,13 @@ public class PostModule : BaseGUIModule
 
     public override void Init()
     {
-        m_volume = GetComponent<Volume>().profile;
-        AddParameters<Sharpen>(m_volume);
-        AddParameters<Glitch>(m_volume);
-        AddParameters<Slice>(m_volume);
-        AddParameters<Overlay>(m_volume);
-        AddParameters<Chroma>(m_volume);
-        AddParameters<Mirror>(m_volume);
+        m_profile = GetComponent<PostProcessVolume>().profile;
+        //    AddParameters<Sharpen>(m_profile);
+        //    AddParameters<Glitch>(m_profile);
+        //    AddParameters<Slice>(m_profile);
+        //    AddParameters<Overlay>(m_profile);
+        AddParameters<Chroma>(m_profile);
+        AddParameters<Mirror>(m_profile);
         base.Init();
 
     }

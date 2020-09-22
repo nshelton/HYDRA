@@ -39,7 +39,7 @@ public class GUITrigger : GUIBase
  
 public class GUIToggle : GUIBase
 {
-    bool Enabled;
+    public bool Enabled;
     private CustomButton Button;
     public GUIToggle(string name, Action<bool> effect)
     {
@@ -108,15 +108,15 @@ public class CustomButton
     public void DrawGUI(Rect area, bool enabled)
     {
         currentRect = area;
-        GUI.Label(area, name );
         GUI.DrawTexture(area, enabled ? GUIUtility.GreenTexture : GUIUtility.WhiteTexture );
+        GUI.Label(area, name );
     }
 
     public void DrawGUI(Rect area, Texture2D texture)
     {
         currentRect = area;
-        GUI.Label(area, name);
         GUI.DrawTexture(area, texture);
+        GUI.Label(area, name);
     }
 }
 

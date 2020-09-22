@@ -9,13 +9,17 @@ public class GUIManager : MonoBehaviour
     public GUISkin m_guiSkin;
     public BaseGUIModule[] m_modules;
 
+    [Range(0,1)]
+    public float m_opacity = 0.5f;
+
     public int ItemHeight = 25;
     public int ItemPadding = 2;
 
-    public int MODULEWIDTH = 200;
+    public static int MODULEWIDTH = 250;
     public int PADDING = 20;
 
     public bool m_displayGUI = true;
+    public bool m_collapseAll = false;
 
     void Start()
     {
@@ -33,9 +37,11 @@ public class GUIManager : MonoBehaviour
         GUIUtility.BaseHeight = ItemHeight;
         GUIUtility.ItemPadding = ItemPadding;
 
-        GUI.color = Color.white;
+        // Background
+        GUI.color = Color.white * m_opacity;
 
-        GUI.contentColor = Color.white;
+        // Text color
+        GUI.contentColor = Color.black;
         GUI.backgroundColor = Color.clear;
 
         if (!m_displayGUI)
@@ -58,37 +64,57 @@ public class GUIManager : MonoBehaviour
                 activeRect.y += module.GetHeight();
             }
         }
+        GUI.color = Color.white * 0.8f;
 
         if (GUIUtility.ControlModal != null)
         {
-
             RoutingModal.DrawGUI();
         }
     }
 
     void Update()
     {
-
         if (GUIUtility.ControlModal != null)
         {
-
             RoutingModal.Update();
             RoutingModal.UIUpdate();
         }
 
         foreach (var module in m_modules)
         {
-        module.ManagerUpdate();
+            module.ManagerUpdate();
 
-        if ( GUIUtility.ControlModal == null)
-        {
-            module.UIUpdate();
-        }
+            if ( GUIUtility.ControlModal == null)
+            {
+                module.UIUpdate();
+            }
         }
 
         if ( Input.GetKeyDown(KeyCode.Escape))
         {
-            m_displayGUI = !m_displayGUI;
+            m_opacity = 0f ;
+        }
+         
+
+        if (Input.GetKeyDown(KeyCode.Alpha1))
+        {
+            m_opacity = 0.4f;
+        }
+
+
+        if (Input.GetKeyDown(KeyCode.Alpha2))
+        {
+            m_opacity = 0.8f;
+        }
+
+
+        if (Input.GetKeyDown(KeyCode.Tab))
+        {
+            m_collapseAll = !m_collapseAll;
+            foreach (var module in m_modules)
+            {
+                module.m_hidden = m_collapseAll;
+            }
         }
 
     }
