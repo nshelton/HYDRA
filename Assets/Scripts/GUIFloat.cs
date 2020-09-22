@@ -8,11 +8,19 @@ public class GUIFloat : GUIBase
     public Action<float> effect;
     public float min = 0;
     public float max = 1;
+
+    // these are always in the range 0-1
+    public float uiMin = 0;
+    public float uiMax = 1;
+
     public float lerpedValue;
     public float value;
     public float defaultValue;
 
-    private bool isActive = false;
+    private bool isSliding = false;
+    private bool isSlidingUIMin = false;
+    private bool isSlidingUIMax = false;
+
     public Rect currentRect = new Rect();
 
     public GUIFloat(string name, float min, float max, float value, Action<float> effect)
@@ -29,7 +37,15 @@ public class GUIFloat : GUIBase
     {
         value = defaultValue;
         routingType = RoutingType.None;
+        uiMin = 0;
+        uiMax = 1;
     }
+
+    private float RangeGrabPosition(float uiVal)
+    {
+        return currentRect.x + currentRect.width * uiVal;
+    }
+
     public override void Update()
     {
         // handle routing
@@ -52,10 +68,11 @@ public class GUIFloat : GUIBase
                 newVal = RoutingServer.SampleOscillator(oscillatorType, oscillatorFrequency);
                 break;
         }
-
         newVal = Mathf.Pow(newVal, power);
+        newVal = Mathf.Lerp(uiMin, uiMax, newVal);
         newVal = min + newVal * (max - min);
         value = Mathf.Lerp(value, newVal, lerp);
+
     }
 
     public override void UIUpdate()
@@ -63,28 +80,31 @@ public class GUIFloat : GUIBase
         ///Handle inputs
         Vector2 mouse = Input.mousePosition;
         mouse.y = Screen.height - mouse.y;
-        if (isActive)
-        {
-            if (isActive)
-            {
-                float percent = (mouse.x - currentRect.min.x) / (currentRect.max.x - currentRect.min.x);
-                value = min + (max - min) * Mathf.Clamp01(percent);
-
-                if (Input.GetMouseButtonUp(0))
-                {
-                    isActive = false;
-                    GUIUtility.ActiveControl = null;
-                }
-            }
-        }
 
         if (currentRect.Contains(mouse))
         {
             if (Input.GetMouseButtonDown(0))
             {
-                float percent = (mouse.x - currentRect.min.x) / (currentRect.max.x - currentRect.min.x);
-                value = min + (max - min) * percent;
-                isActive = true;
+                if (routingType != RoutingType.None)
+                {
+                    if (mouse.x < RangeGrabPosition(uiMin) + 10)
+                    {
+                        isSlidingUIMin = true;
+                    }
+                    else if (mouse.x > RangeGrabPosition(uiMax) - 10)
+                    {
+                        isSlidingUIMax = true;
+                    }
+                    else
+                    {
+                        isSliding = true;
+                    }
+                }
+                else
+                {
+                    isSliding = true;
+                }
+
                 GUIUtility.ActiveControl = this;
             }
             if (Input.GetMouseButtonDown(1))
@@ -92,6 +112,46 @@ public class GUIFloat : GUIBase
                 RoutingModal.SetTarget(this);
             }
         }
+
+
+        if (isSliding)
+        {
+            float percent = (mouse.x - currentRect.min.x) / (currentRect.max.x - currentRect.min.x);
+            value = min + (max - min) * Mathf.Clamp01(percent);
+
+            if (Input.GetMouseButtonUp(0))
+            {
+                isSliding = false;
+                GUIUtility.ActiveControl = null;
+            }
+        }
+        else if (routingType != RoutingType.None)
+        {
+            if (isSlidingUIMin)
+            {
+                float percent = (mouse.x - currentRect.min.x) / (currentRect.max.x - currentRect.min.x);
+                uiMin = Mathf.Clamp01(percent);
+
+                if (Input.GetMouseButtonUp(0))
+                {
+                    isSlidingUIMin = false;
+                    GUIUtility.ActiveControl = null;
+                }
+            }
+            else if (isSlidingUIMax)
+            {
+                float percent = (mouse.x - currentRect.min.x) / (currentRect.max.x - currentRect.min.x);
+                uiMax = Mathf.Clamp01(percent);
+
+                if (Input.GetMouseButtonUp(0))
+                {
+                    isSlidingUIMax = false;
+                    GUIUtility.ActiveControl = null;
+                }
+            }
+        }
+        
+
     }
 
     public override void DrawGUI(Rect sliderRect)
@@ -120,6 +180,17 @@ public class GUIFloat : GUIBase
         sliderRect.width *= (value - min) / (max - min);
         GUI.DrawTexture(sliderRect, color);
 
+        if ( routingType != RoutingType.None)
+        {
+            float newWidth = wholeWidth.width * (uiMax - uiMin);
+            sliderRect.y += sliderRect.height - 4;
+            sliderRect.height = 4;
+            sliderRect.x += wholeWidth.width * uiMin;
+            sliderRect.width = newWidth;
+            GUI.DrawTexture(sliderRect, GUIUtility.WhiteTexture);
+        }
+     
+
         GUI.Label(wholeWidth, name + "\t" + value.ToString("0.##"));
 
         effect(value);
@@ -140,6 +211,8 @@ public class GUIFloat : GUIBase
             lerp = float.Parse(fields[7]);
             power = float.Parse(fields[8]);
             duty = float.Parse(fields[9]);
+            uiMin = float.Parse(fields[10]);
+            uiMax = float.Parse(fields[11]);
         } 
         catch(Exception e)
         {
@@ -154,16 +227,17 @@ public class GUIFloat : GUIBase
         
         s += min.ToString() + ",";
         s += max.ToString() + ",";
+
         s += value.ToString() + ",";
         s += defaultValue.ToString() + ",";
         s += ((int)routingType).ToString() + ",";
         s += ((int)oscillatorType).ToString() + ",";
-        s += (oscillatorFrequency).ToString() + ",";
-        s += (lerp).ToString() + ",";
-        s += (power).ToString() + ",";
-        s += (duty).ToString();
-
+        s += oscillatorFrequency.ToString() + ",";
+        s += lerp.ToString() + ",";
+        s += power.ToString() + ",";
+        s += duty.ToString() + ",";
+        s += uiMin.ToString() + ",";
+        s += uiMax.ToString();
         return s;
-
     }
 }

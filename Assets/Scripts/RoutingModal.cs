@@ -187,6 +187,7 @@ public static class RoutingModal
         if (Event.current.button == 0 && !GetWindowRect(rect).Contains(Event.current.mousePosition))
         {
             Close();
+            return;
         }
 
         GUI.DrawTexture(rect, GUIUtility.BlackTexture);

@@ -24,7 +24,7 @@ public class VFXModule : BaseGUIModule
             if (prop.type == typeof(float))
             {
                 var row = new GUIRow();
-                var p = new GUIFloat(prop.name, 0, 1, 0, delegate (float v)
+                var p = new GUIFloat(prop.name, 0, 1, 0.5f, delegate (float v)
                 {
                     m_effect.SetFloat(prop.name, v);
                 });

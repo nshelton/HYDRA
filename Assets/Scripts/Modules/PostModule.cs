@@ -43,10 +43,6 @@ public class PostModule : BaseGUIModule
     public override void Init()
     {
         m_profile = GetComponent<PostProcessVolume>().profile;
-        //    AddParameters<Sharpen>(m_profile);
-        //    AddParameters<Glitch>(m_profile);
-        //    AddParameters<Slice>(m_profile);
-        //    AddParameters<Overlay>(m_profile);
         AddParameters<Chroma>(m_profile);
         AddParameters<Mirror>(m_profile);
         base.Init();
