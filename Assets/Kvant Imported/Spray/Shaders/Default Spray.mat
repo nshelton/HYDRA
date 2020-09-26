@@ -42,14 +42,14 @@ Material:
     m_Floats:
     - _ColorMode: 0
     - _Emission: 0
-    - _Metallic: 1
+    - _Metallic: 0.606
     - _NormalScale: 1
     - _OcclusionStr: 1
     - _OcclusionStrength: 1
     - _RandomSeed: 0
     - _ScaleMax: 1
     - _ScaleMin: 1
-    - _Smoothness: 1
+    - _Smoothness: 0.6
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _Color2: {r: 0.5, g: 0.5, b: 0.5, a: 1}
