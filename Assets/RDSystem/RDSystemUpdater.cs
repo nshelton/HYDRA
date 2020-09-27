@@ -5,6 +5,7 @@ namespace RDSystem
     public class RDSystemUpdater : BaseGUIModule
     {
         [SerializeField] CustomRenderTexture _texture;
+        [SerializeField] CustomRenderTexture _Input;
         [SerializeField, Range(1, 16)] int _stepsPerFrame = 4;
 
         [SerializeField, Range(0, 1)] float m_RotationPower = 0.5f;
@@ -22,6 +23,7 @@ namespace RDSystem
 
         [SerializeField, Range(0, 1)] float m_dy = 0f;
         [SerializeField, Range(0, 1)] float m_dx = 0f;
+        [SerializeField, Range(0, 1)] float m_InputWeight = 0f;
 
 
         private Material m_material;
@@ -32,7 +34,6 @@ namespace RDSystem
             m_material = GetComponent<MeshRenderer>().material;
         }
         public override string Name() { return "surface"; }
-
 
         public override void Init()
         {
@@ -50,7 +51,8 @@ namespace RDSystem
                 delegate (float v) { m_Amplification = v; }));
             Parameters.Add(new GUIFloat("diagonal", 0, 1, 0.5f,
                 delegate (float v) { m_Diagonal = v; }));
-
+            Parameters.Add(new GUIFloat("inputWeight", -1, 1, 0.0f,
+                delegate (float v) { m_InputWeight = v; }));
             foreach (var p in Parameters)
             {
                 var r = new GUIRow();
@@ -58,11 +60,11 @@ namespace RDSystem
                 GUIRows.Add(r);
             }
             base.Init();
-
         }
 
         void Update()
         {
+            _texture.material.SetTexture("_InputTex", _Input);
             _texture.material.SetFloat("_Laplacian", m_laplacian);
             _texture.material.SetFloat("_Curl", m_curl);
             _texture.material.SetFloat("_RotationPower", m_RotationPower);
@@ -73,6 +75,7 @@ namespace RDSystem
             _texture.material.SetFloat("_CenterWeight", m_centerWeight);
             _texture.material.SetFloat("_EdgeWeight", m_edgeWeight);
             _texture.material.SetFloat("_CornerWeight", m_cornerWeight);
+            _texture.material.SetFloat("_InputWeight", m_InputWeight);
 
             _texture.material.SetFloat("_dx", m_dx / 1000);
             _texture.material.SetFloat("_dy", m_dy / 1000);
@@ -80,6 +83,8 @@ namespace RDSystem
             m_material.SetFloat("_Displacement", m_displace);
 
             _texture.Update(_stepsPerFrame);
+
+
 
             if (Input.GetKeyDown(KeyCode.Space))
             {

@@ -14,8 +14,8 @@
         _Metallic0("Metallic 0", Range(0, 1)) = 0.0
         _Metallic1("Metallic 1", Range(0, 1)) = 0.0
         [Space]
-        _Threshold("Threshold", Range(0, 1)) = 0.1
-        _Fading("Edge Smoothing", Range(0, 1)) = 0.2
+        _Threshold("Threshold", float) = 0.1
+        _Fading("Edge Smoothing", float) = 0.2
         _NormalStrength("Normal Strength", Range(0, 1)) = 0.9
         }
         SubShader {
@@ -58,10 +58,10 @@
             {
                 float lod = 1;
              float val = normalize(tex2Dlod(_MainTex, float4(uv, lod,0)).xyz).z * 1;
-                val += normalize(tex2Dlod(_MainTex, float4(uv/4, lod, 0)).xyz).z * 4;
-                val += normalize(tex2Dlod(_MainTex, float4(uv/2, lod, 0)).xyz).z * 2;
-                val += normalize(tex2Dlod(_MainTex, float4(uv*2, lod, 0)).xyz).z * 0.5;
-                return   val /7;
+              //  val += normalize(tex2Dlod(_MainTex, float4(uv/4, lod, 0)).xyz).z * 4;
+              //  val += normalize(tex2Dlod(_MainTex, float4(uv/2, lod, 0)).xyz).z * 2;
+               // val += normalize(tex2Dlod(_MainTex, float4(uv*2, lod, 0)).xyz).z * 0.5;
+                return   val ;
 
                /*
 
@@ -130,10 +130,8 @@
                 half v3 = FBM( uv - duv.zy);
                 half v4 = FBM( uv + duv.zy);
 
-                half p =  (v0);
-
+                float p = smoothstep(_Threshold - _Fading, _Threshold + _Fading, v0 );
                 o.Albedo =  lerp(_Color0.rgb, _Color1.rgb, p);
-              //  o.Emission = (getTwistNormal(uv));
                 o.Smoothness = lerp(_Smoothness0, _Smoothness1, p);
                 o.Metallic = lerp(_Metallic0, _Metallic1, p);
 

@@ -2,11 +2,13 @@
 {
     Properties
     {
+        _InputTex ("Texture", 2D) = "black" {}
     }
 
     CGINCLUDE
 
     #include "UnityCustomRenderTexture.cginc"
+
 
     float _RotationPower, _Amplification, _Diagonal, _Curl, _Laplacian;
     float _LaplDivScale;
@@ -16,6 +18,11 @@
     float _CornerWeight;
     float _dx;
     float _dy;
+
+    float _InputWeight;
+
+    sampler2D _InputTex;
+
 
     half4 frag(v2f_customrendertexture i) : SV_Target
     {
@@ -43,8 +50,8 @@
         const float amp = 1.0; // self-amplification
         const float sq2 = 0.7; // diagonal weight
         */
-
-        float2 vUv = i.globalTexcoord + float2(_dx, _dy);
+        float2 zoom = normalize(i.globalTexcoord - 0.5) * -0.001 ;
+        float2 vUv = i.globalTexcoord + float2(_dx, _dy) + zoom;
         float2 texel = 1. / float2(_CustomRenderTextureWidth, _CustomRenderTextureHeight);
 
         // 3x3 neighborhood coordinates
@@ -111,6 +118,11 @@
         }*/
    
         //}
+        fixed4 c = tex2D (_InputTex, vUv)  ;
+
+             a  += c.r * _InputWeight;//vUv.x - 0.5;
+            b  += c.r * _InputWeight;//vUv.y-0.5;
+            div  += c.r * _InputWeight;
     
         return clamp(float4(a,b,div,1), -1., 1.);
 
