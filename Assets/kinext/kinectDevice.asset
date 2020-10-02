@@ -16,11 +16,11 @@ MonoBehaviour:
   _exposure: -6
   _autoWhiteBalance: 1
   _whiteBalance: 3200
-  _brightness: 0.5
-  _contrast: 0.5
-  _saturation: 0.5
-  _sharpness: 0.5
+  _brightness: 0.725
+  _contrast: 0.621
+  _saturation: 0.551
+  _sharpness: 1
   _gain: 1
   _enableBlc: 0
   _powerIs60Hz: 1
-  _maxDepth: 2.68
+  _maxDepth: 1.4

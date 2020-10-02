@@ -15,6 +15,41 @@ MonoBehaviour:
   settings:
   - {fileID: 4192225804890082933}
   - {fileID: 3028307977815771658}
+  - {fileID: 814959021224776977}
+--- !u!114 &814959021224776977
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8dbfa4dfcaadfc34cbab4e6b62c0e092, type: 3}
+  m_Name: vhs
+  m_EditorClassIdentifier: 
+  active: 1
+  enabled:
+    overrideState: 1
+    value: 1
+  RGBFuzz:
+    overrideState: 1
+    value: 0.5
+  RGBScroll:
+    overrideState: 1
+    value: 0.5
+  Scanline:
+    overrideState: 1
+    value: 0.5
+  Jump:
+    overrideState: 1
+    value: 0.5
+  Jitter:
+    overrideState: 1
+    value: 0.5
+  Drift:
+    overrideState: 1
+    value: 0.5
 --- !u!114 &3028307977815771658
 MonoBehaviour:
   m_ObjectHideFlags: 3

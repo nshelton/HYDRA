@@ -45,6 +45,7 @@ public class PostModule : BaseGUIModule
         m_profile = GetComponent<PostProcessVolume>().profile;
         AddParameters<Chroma>(m_profile);
         AddParameters<Mirror>(m_profile);
+        AddParameters<vhs>(m_profile);
         base.Init();
 
     }

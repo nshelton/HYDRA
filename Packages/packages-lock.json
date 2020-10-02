@@ -159,6 +159,13 @@
       },
       "url": "https://registry.npmjs.com"
     },
+    "jp.keijiro.klak.spout": {
+      "version": "1.0.0",
+      "depth": 0,
+      "source": "registry",
+      "dependencies": {},
+      "url": "https://registry.npmjs.com"
+    },
     "jp.keijiro.lasp": {
       "version": "2.1.2",
       "depth": 1,

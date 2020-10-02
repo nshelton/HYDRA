@@ -1,12 +1,8 @@
 ﻿using Lasp;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using CircularBuffer;
-using UnityEditor.Rendering;
 using System;
-using System.Dynamic;
-using UnityEngine.SocialPlatforms.Impl;
 
 public class BeatDetector : MonoBehaviour
 {
