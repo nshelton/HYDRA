@@ -36,19 +36,19 @@ MonoBehaviour:
     value: 1
   RGBFuzz:
     overrideState: 1
-    value: 0.5
+    value: 0
   RGBScroll:
     overrideState: 1
-    value: 0.5
+    value: 0
   Scanline:
     overrideState: 1
-    value: 0.5
+    value: 0
   Jump:
     overrideState: 1
-    value: 0.5
+    value: 0
   Jitter:
     overrideState: 1
-    value: 0.5
+    value: 0
 --- !u!114 &1586317787216574857
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -126,7 +126,7 @@ MonoBehaviour:
     value: 1
   Blend:
     overrideState: 1
-    value: 0.5
+    value: 0
 --- !u!114 &4192225804890082933
 MonoBehaviour:
   m_ObjectHideFlags: 3

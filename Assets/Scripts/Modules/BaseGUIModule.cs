@@ -22,7 +22,7 @@ public abstract class BaseGUIModule : MonoBehaviour
 
         for (int i = 0; i < Parameters.Count; i++)
         {
-            if (Parameters[i] is GUIFloat)
+            if (Parameters[i] is GUIFloat || Parameters[i] is GUIToggle)
             {
                 var name = Parameters[i].name;
                 var data = Parameters[i].SerializeData();
@@ -49,7 +49,6 @@ public abstract class BaseGUIModule : MonoBehaviour
                 if (parameterNameMap.ContainsKey(name))
                 {
                     parameterNameMap[name].SetFromFieldsString(data);
-
                 }
                 else
                 {
@@ -60,6 +59,7 @@ public abstract class BaseGUIModule : MonoBehaviour
     }
 
     public virtual bool ShowPresets() { return true; }
+    public virtual bool ShowTitle() { return true; }
 
     public void SavePreset(string name)
     {
@@ -151,16 +151,19 @@ public abstract class BaseGUIModule : MonoBehaviour
         GUIRows.Clear();
         Parameters.Clear();
 
-        var titleRow = new GUIRow();
-        titleRow.Items.Add(new GUITrigger(name, delegate { this.m_hidden = !this.m_hidden; }));
-        GUIRows.Add(titleRow);
+        if (ShowTitle())
+        {
+            var titleRow = new GUIRow();
+            titleRow.GUIColor = Color.cyan;
+            titleRow.Items.Add(new GUITrigger(name, delegate { this.m_hidden = !this.m_hidden; }));
+            GUIRows.Add(titleRow);
+        }
 
         if (ShowPresets())
         {
-            var PresetRow = CreatePresetRow();
+            var PresetRow = CreatePresetRow();  
             GUIRows.Add(PresetRow);
         }
-
 
         InitInternal();
 

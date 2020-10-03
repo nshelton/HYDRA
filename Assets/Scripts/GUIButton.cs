@@ -40,10 +40,12 @@ public class GUIToggle : GUIBase
 {
     public bool Enabled;
     private CustomButton Button;
+    Action<bool> Effect;
     public GUIToggle(string name, Action<bool> effect)
     {
         this.Enabled = false;
         this.name = name;
+        this.Effect = effect;
 
         Button = new CustomButton(this.name, delegate
         {
@@ -68,13 +70,34 @@ public class GUIToggle : GUIBase
         Button.Update();
         base.UIUpdate();
     }
+
+    public override void SetFromFieldsString(string s)
+    {
+        try
+        {
+            bool status = float.Parse(s) ==1;
+            this.Effect(status);
+            this.Enabled = status;
+        }
+        catch (Exception e)
+        {
+            Debug.LogError(e);
+            Debug.LogError("error parsing preset " + s);
+        }
+    }
+
+    public override string SerializeData()
+    {
+        if (Enabled) return "1";
+        else return "0";
+    }
 }
 
 public class CustomButton 
 {
 
-    Action actionLeft;
-    Action actionRight;
+    public Action actionLeft;
+    public Action actionRight;
 
     string name;
     Rect currentRect = new Rect();

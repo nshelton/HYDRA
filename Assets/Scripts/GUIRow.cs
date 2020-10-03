@@ -23,9 +23,14 @@ public class GUIRow
     }
 
     public float Height = GUIUtility.BaseHeight;
+    public Color GUIColor = Color.white;
     
     public void DrawGUI(Rect rowRect)
     {
+        var prevGUIColor = GUI.color;
+
+        GUI.color = Color.white * GUIUtility.Opacity * GUIColor;
+
         float width = rowRect.width / Items.Count;
 
         Rect itemRect = new Rect(
@@ -39,6 +44,8 @@ public class GUIRow
             Items[i].DrawGUI(itemRect);
             itemRect.x += width;
         }
+
+        GUI.color = prevGUIColor;
     }
 }
 

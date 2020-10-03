@@ -38,11 +38,10 @@ public class GUIManager : MonoBehaviour
 
     private void OnGUI()
     {
+        GUIUtility.Opacity = m_opacity;
+
         GUIUtility.BaseHeight = ItemHeight;
         GUIUtility.ItemPadding = ItemPadding;
-
-        // Background
-        GUI.color = Color.white * m_opacity;
 
         // Text color
         GUI.contentColor = Color.black;

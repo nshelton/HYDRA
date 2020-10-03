@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.IO;
-using System.Management.Instrumentation;
-using System.Reflection;
+﻿using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 using static PresetDatabase;
 
 public class MacroModule : BaseGUIModule
@@ -35,9 +29,9 @@ public class MacroModule : BaseGUIModule
     {
         return false;
     }
-    private static string GetFilename(string name)
+    public override bool ShowTitle()
     {
-        return $"Macros/{name}";
+        return false;
     }
 
     private Macro TryLoadMacro(string macroName)
@@ -51,7 +45,7 @@ public class MacroModule : BaseGUIModule
             if (p.Data != string.Empty)
             {
                 isValid = true;
-                m.Modules[p.Name] = p;
+                m.Modules[modName] = p;
             }
         }
 
@@ -96,8 +90,6 @@ public class MacroModule : BaseGUIModule
                 if (macro.Modules.ContainsKey(moduleName))
                 {
                     m_modules[moduleName].SetState(macro.Modules[moduleName].Data);
-                 
-                    
                 }
             }
 
@@ -114,13 +106,12 @@ public class MacroModule : BaseGUIModule
         foreach (var moduleName in m_modules.Keys)
         {
             var data = m_modules[moduleName].GetState();
-            macro.Modules[moduleName] = new Preset { Data = data, ModuleName = moduleName, Name=name };
-            PresetDatabase.SaveMacroPreset(moduleName, name, data);
+            macro.Modules[moduleName] = new Preset { Data = data, ModuleName = moduleName, Name = name };
+            SaveMacroPreset(moduleName, name, data);
         }
 
         m_macros[name] = macro;
         m_buttonMap[name].Assigned = true;
-
     }
 
     public override void InitInternal()

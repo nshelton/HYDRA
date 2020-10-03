@@ -7,6 +7,7 @@ public class CameraModule : BaseGUIModule
 {
     public Camera m_camera;
 
+    public MeshRenderer m_spoutRenderer;
     public LinearMotion m_linear;
     public BrownianMotion m_brownian;
     public SmoothFollow m_follow;
@@ -15,13 +16,31 @@ public class CameraModule : BaseGUIModule
     public Transform[] m_transforms;
     public Transform[] m_zOffsetTransforms;
 
+    private float m_spoutScale = 1;
+
     public override string Name() { return "camera"; }
 
     public override void InitInternal()
     {
+        Parameters.Add(new GUIFloat("spout", 0, 1, 1, delegate (float v)
+        {
+            m_spoutRenderer.sharedMaterial.SetColor("_Color", Color.white * v);
+            m_spoutRenderer.sharedMaterial.SetColor("_EmissionColor", Color.white * v);
+        }));
+
+        Parameters.Add(new GUIFloat("spoutScale", 0, 2, 1, delegate (float v)
+        {
+            m_spoutScale = v;
+        }));
+
+
         Parameters.Add(new GUIFloat("fov", 25, 120, 80, delegate(float v)
         {
             m_camera.fieldOfView = v;
+            m_spoutRenderer.transform.localScale = 
+                new Vector3(16, 9, 1) * 
+                5/4 * m_spoutScale * Mathf.Tan(Mathf.Deg2Rad * v/2) ; 
+
         }));
 
         Parameters.Add(new GUIFloat("offset", 0, 10, 2, delegate (float v) 

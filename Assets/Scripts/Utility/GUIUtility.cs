@@ -7,6 +7,7 @@ public class GUIUtility
 
     public static float BaseHeight = 25;
     public static float ItemPadding = 2;
+    public static float Opacity = 0.5f;
 
     public static GUIBase ActiveControl;
 
