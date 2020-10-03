@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using static MacroDatabase;
+using static PresetDatabase;
 
 public abstract class BaseGUIModule : MonoBehaviour
 {
@@ -13,8 +13,8 @@ public abstract class BaseGUIModule : MonoBehaviour
     public List<GUIBase> Parameters = new List<GUIBase>();
     private Dictionary<string, GUIBase> parameterNameMap = new Dictionary<string, GUIBase>();
 
-    private Dictionary<string, Macro> MacroNameToStateMap = new Dictionary<string, Macro>();
-    private Dictionary<string, GUIMacroTrigger> MacroNameToButtonMap = new Dictionary<string, GUIMacroTrigger>();
+    private Dictionary<string, Preset> PresetNameToStateMap = new Dictionary<string, Preset>();
+    private Dictionary<string, GUIPresetTrigger> PresetNameToButtonMap = new Dictionary<string, GUIPresetTrigger>();
 
     public string GetState()
     {
@@ -59,35 +59,36 @@ public abstract class BaseGUIModule : MonoBehaviour
         }
     }
 
-    public virtual bool ShowMacros() { return true; }
+    public virtual bool ShowPresets() { return true; }
 
-    public void SaveMacro(string name)
+    public void SavePreset(string name)
     {
        
         var state = GetState();
-        MacroNameToStateMap[name].Data = state;
-        MacroNameToButtonMap[name].Assigned = true;
-        MacroDatabase.SaveMacro(Name(), name, state);
+        PresetNameToStateMap[name].Data = state;
+        PresetNameToButtonMap[name].Assigned = true;
+        PresetDatabase.SavePreset(Name(), name, state);
+
     }
 
-    public Dictionary<string, Macro> LoadMacroData()
+    public Dictionary<string, Preset> LoadPresetData()
     {
-        Dictionary<string, Macro> macros = new Dictionary<string, Macro>();
+        Dictionary<string, Preset> Presets = new Dictionary<string, Preset>();
 
         for(int i = 0; i < 5; i ++)
         {
-            macros[i.ToString()] = TryGetMacro(Name(), i.ToString());
+            Presets[i.ToString()] = TryGetPreset(Name(), i.ToString());
         }
 
-        return macros;
+        return Presets;
     }
 
 
-    public void SetMacro(string name)
+    public void SetPreset(string name)
     {
-        if (MacroNameToStateMap.ContainsKey(name))
+        if (PresetNameToStateMap.ContainsKey(name))
         {
-            var m = MacroNameToStateMap[name];
+            var m = PresetNameToStateMap[name];
             if (m.Data != String.Empty)
             {
                 Debug.Log("SET" + m.Data);
@@ -103,60 +104,67 @@ public abstract class BaseGUIModule : MonoBehaviour
         }
         else
         {
-            Debug.LogError($"Cound not find macro {name}");
+            Debug.LogError($"Cound not find Preset {name}");
             return;
         }
 
-        foreach( var m in MacroNameToButtonMap)
+        foreach( var m in PresetNameToButtonMap)
         {
             m.Value.Active = false;
         }
 
-        MacroNameToButtonMap[name].Active = true;
+        PresetNameToButtonMap[name].Active = true;
     }
 
 
-    void SetupMacros()
+    GUIRow CreatePresetRow()
     {
-        MacroNameToStateMap = LoadMacroData();
+        PresetNameToStateMap = LoadPresetData();
 
-        GUIRow macroRow = new GUIRow();
+        GUIRow PresetRow = new GUIRow();
 
-        foreach(var m in MacroNameToStateMap)
+        foreach(var m in PresetNameToStateMap)
         {
-            var macroButton = createMacroButton(m.Value);
-            MacroNameToButtonMap[m.Value.Name] = macroButton;
-            macroRow.Items.Add(macroButton);
+            var PresetButton = createPresetButton(m.Value);
+            PresetNameToButtonMap[m.Value.Name] = PresetButton;
+            PresetRow.Items.Add(PresetButton);
         }
 
-        GUIRows.Insert(0, macroRow);
-
+        return PresetRow;
     }
-    GUIMacroTrigger createMacroButton(Macro m)
+
+    GUIPresetTrigger createPresetButton(Preset m)
     {
-        var trigger = new GUIMacroTrigger(m.Name,
-            delegate { this.SetMacro(m.Name); },
-            delegate { this.SaveMacro(m.Name); }
+        var trigger = new GUIPresetTrigger(m.Name,
+            delegate { this.SetPreset(m.Name); },
+            delegate { this.SavePreset(m.Name); }
         );
 
         trigger.Assigned = m.Data != String.Empty;
 
         return trigger;
     }
+    public virtual void InitInternal() { }
 
     public virtual void Init()
     {
-        if (ShowMacros())
-        {
-            SetupMacros();
-
-        }
+        GUIRows.Clear();
+        Parameters.Clear();
 
         var titleRow = new GUIRow();
         titleRow.Items.Add(new GUITrigger(name, delegate { this.m_hidden = !this.m_hidden; }));
-        GUIRows.Insert(0, titleRow);
+        GUIRows.Add(titleRow);
 
-        foreach(GUIBase p in Parameters)
+        if (ShowPresets())
+        {
+            var PresetRow = CreatePresetRow();
+            GUIRows.Add(PresetRow);
+        }
+
+
+        InitInternal();
+
+        foreach (GUIBase p in Parameters)
         {
             parameterNameMap[p.name] = p;
         }
@@ -171,7 +179,7 @@ public abstract class BaseGUIModule : MonoBehaviour
   
         for (int i = 0; i < GUIRows.Count; i++)
         {
-            height += GUIRows[i].GetHeight();
+            height += GUIRows[i].Height;
 
             if (m_hidden && i > 1)
                 break;
@@ -200,10 +208,10 @@ public abstract class BaseGUIModule : MonoBehaviour
         }
         else
         {
-            // if hidden still update title row and macro row
+            // if hidden still update title row and Preset row
             GUIRows[0].UIUpdate();
 
-            if (ShowMacros())
+            if (ShowPresets())
             {
                 GUIRows[1].UIUpdate();
             }
@@ -225,7 +233,7 @@ public abstract class BaseGUIModule : MonoBehaviour
                 return;
 
             var row = GUIRows[i];
-            rowRect.height = row.GetHeight();
+            rowRect.height = row.Height;
             row.DrawGUI(rowRect);
             rowRect.y += rowRect.height;
         }

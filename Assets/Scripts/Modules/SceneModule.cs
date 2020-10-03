@@ -7,9 +7,9 @@ public class SceneModule : BaseGUIModule
     public GameObject[] m_scenes;
 
     public override string Name() { return "scenes"; }
-    public override bool ShowMacros() { return false; }
+    public override bool ShowPresets() { return false; }
 
-    public override void Init()
+    public override void InitInternal()
     {
         for (int i = 0; i < m_scenes.Length; i+=2)
         {
@@ -27,8 +27,6 @@ public class SceneModule : BaseGUIModule
 
             GUIRows.Add(row);
         }
-
-        base.Init();
     }
 
 }

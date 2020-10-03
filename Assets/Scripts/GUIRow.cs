@@ -22,23 +22,8 @@ public class GUIRow
         }
     }
 
-    public float GetHeight()
-    {
-        if (Items.Count == 0)
-        {
-            return GUIUtility.BaseHeight * 0.5f;
-        }
-        else if (Items[0] is GUIFloat)
-        {
-            return GUIUtility.BaseHeight;
-        }
-        else if (Items[0] is GUIToggle || Items[0] is GUITrigger || Items[0] is GUITexture)
-        {
-            return GUIUtility.BaseHeight * 1f;
-        }
-        return 0;
-    }
-
+    public float Height = GUIUtility.BaseHeight;
+    
     public void DrawGUI(Rect rowRect)
     {
         float width = rowRect.width / Items.Count;

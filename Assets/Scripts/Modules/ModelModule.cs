@@ -11,7 +11,7 @@ public class ModelModule : BaseGUIModule
 
     public override string Name() { return "model"; }
 
-    public override void Init()
+    public override void InitInternal()
     {
         Parameters.Add(new GUIFloat("scale", 0, 3, 1, delegate (float v)
         {
@@ -39,6 +39,5 @@ public class ModelModule : BaseGUIModule
             row.Items.Add(p);
             GUIRows.Add(row);
         }
-        base.Init();
     }
 }

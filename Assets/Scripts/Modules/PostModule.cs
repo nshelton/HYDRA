@@ -40,13 +40,12 @@ public class PostModule : BaseGUIModule
         }
     }
 
-    public override void Init()
+    public override void InitInternal()
     {
         m_profile = GetComponent<PostProcessVolume>().profile;
         AddParameters<Chroma>(m_profile);
         AddParameters<Mirror>(m_profile);
         AddParameters<vhs>(m_profile);
-        base.Init();
-
+        AddParameters<feedback>(m_profile);
     }
 }

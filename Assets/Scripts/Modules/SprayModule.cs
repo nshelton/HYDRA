@@ -8,7 +8,7 @@ public class SprayModule : BaseGUIModule
     public override string Name() { return "spray"; }
 
     private Kvant.SprayMV[] m_spray;
-    public override void Init()
+    public override void InitInternal()
     {
         m_spray = GetComponentsInChildren<Kvant.SprayMV>();
 
@@ -33,7 +33,5 @@ public class SprayModule : BaseGUIModule
             r.Items.Add(p);
             GUIRows.Add(r);
         }
-
-        base.Init();
     }
 }

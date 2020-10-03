@@ -62,21 +62,21 @@ Material:
     m_Floats:
     - _BumpScale: 1
     - _CullDist: 1
-    - _CullThresh: 0.3
+    - _CullThresh: 0.11
     - _Cutoff: 0.5
     - _DetailNormalMapScale: 1
     - _Displacement: 0.3
     - _DstBlend: 0
     - _EdgeLength: 2
-    - _EmissionAmount: 0
-    - _EmissionPct: 0.491
+    - _EmissionAmount: 10
+    - _EmissionPct: 0
     - _Gloss: 0.2
     - _GlossMapScale: 1
     - _Glossiness: 0.5
     - _GlossyReflections: 1
     - _Metallic: 0
     - _Mode: 0
-    - _NormalDist: 10
+    - _NormalDist: 3.3
     - _OcclusionStrength: 1
     - _Parallax: 0.02
     - _SmoothnessTextureChannel: 0
@@ -86,7 +86,7 @@ Material:
     - _UVSec: 0
     - _ZWrite: 1
     - _noiseAmp: 0
-    - _noiseFreq: 9.19
+    - _noiseFreq: 0
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 1, g: 0.49019608, b: 0.15686274, a: 1}

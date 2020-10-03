@@ -17,9 +17,8 @@ public class CameraModule : BaseGUIModule
 
     public override string Name() { return "camera"; }
 
-    public override void Init()
+    public override void InitInternal()
     {
-
         Parameters.Add(new GUIFloat("fov", 25, 120, 80, delegate(float v)
         {
             m_camera.fieldOfView = v;
@@ -73,9 +72,5 @@ public class CameraModule : BaseGUIModule
         row.Items.Add(Parameters[Parameters.Count - 1]);
 
         GUIRows.Add(row);
-
-        base.Init();
     }
-     
-    
 }

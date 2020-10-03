@@ -217,7 +217,7 @@ public class GUIFloat : GUIBase
         catch(Exception e)
         {
             Debug.LogError(e);
-            Debug.LogError("error parsing macro " + s);
+            Debug.LogError("error parsing preset " + s);
         }
     }
 

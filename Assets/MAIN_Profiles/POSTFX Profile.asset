@@ -16,6 +16,8 @@ MonoBehaviour:
   - {fileID: 4192225804890082933}
   - {fileID: 3028307977815771658}
   - {fileID: 814959021224776977}
+  - {fileID: 1586317787216574857}
+  - {fileID: 3897219245052189605}
 --- !u!114 &814959021224776977
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -47,9 +49,46 @@ MonoBehaviour:
   Jitter:
     overrideState: 1
     value: 0.5
-  Drift:
+--- !u!114 &1586317787216574857
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2412f8d7f083c9f4385ba367fd5c44f1, type: 3}
+  m_Name: EdgeDetect
+  m_EditorClassIdentifier: 
+  active: 0
+  enabled:
     overrideState: 1
-    value: 0.5
+    value: 1
+  mode:
+    overrideState: 1
+    value: 3
+  sensitivityDepth:
+    overrideState: 1
+    value: 1
+  sensitivityNormals:
+    overrideState: 1
+    value: 1
+  lumThreshold:
+    overrideState: 1
+    value: 0.2
+  edgeExp:
+    overrideState: 1
+    value: 1
+  sampleDist:
+    overrideState: 1
+    value: 1
+  edgesOnly:
+    overrideState: 1
+    value: 1
+  edgesOnlyBgColor:
+    overrideState: 1
+    value: {r: 1, g: 1, b: 1, a: 1}
 --- !u!114 &3028307977815771658
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -69,6 +108,25 @@ MonoBehaviour:
   amount:
     overrideState: 1
     value: 0
+--- !u!114 &3897219245052189605
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8358184d9c6bf374ba8b3d1ac7e8f3fa, type: 3}
+  m_Name: feedback
+  m_EditorClassIdentifier: 
+  active: 1
+  enabled:
+    overrideState: 1
+    value: 1
+  Blend:
+    overrideState: 1
+    value: 0.5
 --- !u!114 &4192225804890082933
 MonoBehaviour:
   m_ObjectHideFlags: 3

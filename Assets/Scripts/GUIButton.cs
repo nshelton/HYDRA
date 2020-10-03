@@ -120,12 +120,12 @@ public class CustomButton
 }
 
 
-public class GUIMacroTrigger : GUITrigger
+public class GUIPresetTrigger : GUITrigger
 {
     public bool Assigned = false;
     public bool Active = false;
 
-    public GUIMacroTrigger(string name, Action effectL, Action effectR) :
+    public GUIPresetTrigger(string name, Action effectL, Action effectR) :
         base(name, effectL, effectR)
     {
     }

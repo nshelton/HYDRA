@@ -9,7 +9,7 @@ public class VFXModule : BaseGUIModule
     private string m_name;
     public override string Name() { return m_name; }
 
-    public override void Init()
+    public override void InitInternal()
     {
         m_effect = GetComponent<VisualEffect>();
 
@@ -33,8 +33,5 @@ public class VFXModule : BaseGUIModule
                 GUIRows.Add(row);
             }
         }
-
-        base.Init();
-
     }
 }

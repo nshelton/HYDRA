@@ -35,7 +35,7 @@ namespace RDSystem
         }
         public override string Name() { return "surface"; }
 
-        public override void Init()
+        public override void InitInternal()
         {
             Parameters.Add(new GUIFloat("displace", 0, 1, 0.1f,
                 delegate (float v) { m_displace = v; }));
@@ -59,7 +59,6 @@ namespace RDSystem
                 r.Items.Add(p);
                 GUIRows.Add(r);
             }
-            base.Init();
         }
 
         void Update()

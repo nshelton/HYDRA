@@ -25,7 +25,7 @@ public class LightingModule : BaseGUIModule
 
     public override string Name() { return "lighting"; }
 
-    public override void Init()
+    public override void InitInternal()
     {
         m_camera = Camera.main;
 
@@ -72,7 +72,6 @@ public class LightingModule : BaseGUIModule
             Time.timeScale = v;
         }));
 
-
         foreach (var p in Parameters)
         {
             var r = new GUIRow();
@@ -112,7 +111,5 @@ public class LightingModule : BaseGUIModule
         row.Items.Add(Parameters[Parameters.Count - 1]);
 
         GUIRows.Add(row);
-          
-        base.Init();
     }
 }

@@ -8,6 +8,7 @@ public class GUIManager : MonoBehaviour
 
     public GUISkin m_guiSkin;
     public BaseGUIModule[] m_modules;
+    public MacroModule m_macroModule;
 
     [Range(0,1)]
     public float m_opacity = 0.5f;
@@ -30,6 +31,9 @@ public class GUIManager : MonoBehaviour
         {
             module.Init();
         }
+
+        m_macroModule.Init();
+
     }
 
     private void OnGUI()
@@ -48,7 +52,7 @@ public class GUIManager : MonoBehaviour
             return;
 
         GUI.skin = m_guiSkin;
-        Rect activeRect = new Rect(PADDING, PADDING, MODULEWIDTH, Screen.height - 2 * PADDING);
+        Rect activeRect = new Rect(0, 0, MODULEWIDTH, Screen.height - 2 * PADDING);
 
         foreach (var module in m_modules)
         {
@@ -64,6 +68,12 @@ public class GUIManager : MonoBehaviour
                 activeRect.y += module.GetHeight();
             }
         }
+
+        m_macroModule.DrawGUI(new Rect(
+            Screen.width - MODULEWIDTH, 
+            0,
+            MODULEWIDTH, Screen.height));
+
         GUI.color = Color.white * 0.8f;
 
         if (GUIUtility.ControlModal != null)
@@ -89,6 +99,8 @@ public class GUIManager : MonoBehaviour
                 module.UIUpdate();
             }
         }
+
+        m_macroModule.UIUpdate();
 
         if ( Input.GetKeyDown(KeyCode.Escape))
         {

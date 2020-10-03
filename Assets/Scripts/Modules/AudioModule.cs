@@ -18,9 +18,9 @@ public class AudioModule : BaseGUIModule
     int m_textureOffset = 0;
 
     public override string Name() { return "audio"; }
-    public override bool ShowMacros() { return false; }
+    public override bool ShowPresets() { return false; }
 
-    public override void Init()
+    public override void InitInternal()
     {
         RoutingServer.m_bass = m_bassLevel;
         RoutingServer.m_treble = m_trebleLevel;
@@ -47,9 +47,6 @@ public class AudioModule : BaseGUIModule
 
         row.Items.Add(new GUITexture(m_levelTexture));
         GUIRows.Add(row);
-
-        base.Init();
-
     }
 
     public override void Update()
