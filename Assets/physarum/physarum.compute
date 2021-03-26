@@ -1,0 +1,393 @@
+﻿#pragma kernel Step
+#pragma kernel RenderAgents
+#pragma kernel RenderField
+#pragma kernel XGaussian
+#pragma kernel YGaussian
+#pragma kernel Deposit
+#pragma kernel RenderLuma
+#pragma kernel Post
+
+#include "noise/SimplexNoise3D.hlsl"
+
+struct Agent
+{
+    float2 position;
+    float direction;
+    float age;
+    float3 color;
+    float random;
+};
+
+RWStructuredBuffer<Agent> _particleBuffer;
+
+Texture2D<float4> _Source;
+SamplerState sampler_Source;
+
+Texture2D<float4> _Input;
+SamplerState sampler_Input;
+
+RWTexture2D<float4> _Destination;
+float2 _fieldDim;
+float2 _screenDim;
+
+Texture2D<float4> _gradient;
+SamplerState sampler_gradient;
+
+float _dt;
+float _speed;
+float4 _speedRandom;
+
+float _blurKernelA;
+float _blurKernelB;
+float _blurKernelC;
+
+float _decayWeights;
+float _renderScale;
+float _sensorRadians;
+float _sensorDist;
+
+float _rotationRadians;
+float _pheremoneAmount;
+float _inputAmount;
+float4 _inputScaleOffset;
+float _margin;
+float4 _pointColor;
+float _maxLifetime;
+float _lumaAmount;
+
+float _time;
+float4 _noiseParam;
+float2 _linearForce;
+float _radialForce;
+float2 _radialCenter;
+
+float _colorFromTexture;
+
+float _fractalLevels;
+
+uint wang_hash(uint seed)
+{
+    seed = (seed ^ 61) ^ (seed >> 16);
+    seed *= 9;
+    seed = seed ^ (seed >> 4);
+    seed *= 0x27d4eb2d;
+    seed = seed ^ (seed >> 15);
+    return seed;
+}
+
+float wang_float(uint hash)
+{
+    return hash / float(0x7FFFFFFF) / 2.0;
+}
+
+float randomSign(float v)
+{
+	float x = wang_float(wang_hash(v));
+	return (step(0.5, x)*2.0) -1.0;
+}
+
+float2 Random(float2 p)
+{
+    float3 a = frac(p.xyx * float3(123.34, 234.34, 345.65));
+    a += dot(a,a + 34.45);
+    return frac(float2(a.x * a.y, a.y * a.z));
+}
+
+
+[numthreads(8, 8, 1)]
+void XGaussian(uint3 id : SV_DispatchThreadID)
+{ 
+    uint3 delta = uint3(0, 1, 2);
+    float4 blur =  
+        _Source[id.xy - delta.xz] * _blurKernelA +
+        _Source[id.xy - delta.xy] * _blurKernelB +
+        _Source[id.xy] * _blurKernelC +
+        _Source[id.xy + delta.xy] * _blurKernelB +
+        _Source[id.xy + delta.xz] * _blurKernelA;
+
+    _Destination[id.xy] = blur * _decayWeights;
+}
+
+[numthreads(8, 8, 1)]
+void YGaussian(uint3 id : SV_DispatchThreadID)
+{ 
+    uint3 delta = uint3(0, 1, 2);
+    float4 blur =  
+        _Source[id.xy - delta.zx] * _blurKernelA +
+        _Source[id.xy - delta.yx] * _blurKernelB +
+        _Source[id.xy] * _blurKernelC +
+        _Source[id.xy + delta.yx] * _blurKernelB +
+        _Source[id.xy + delta.zx] * _blurKernelA;
+
+    _Destination[id.xy] = blur * _decayWeights;
+}
+
+float2 BoundaryConditions(float2 currentPosition)
+{
+    float2 nextPosition = currentPosition;
+    
+    if(nextPosition.x < 0)
+    {
+        nextPosition.x += 1;      
+    }
+    else if(nextPosition.x > 1)
+    {
+        nextPosition.x -= 1;    
+    }
+    
+    if(nextPosition.y < 0)
+    {
+        nextPosition.y += 1;
+    }
+    else if(nextPosition.y > 1)
+    {
+        nextPosition.y -= 1;
+    }
+    
+    return nextPosition;
+}
+float2 GetDirection(float theta)
+{
+    return float2(cos(theta), sin(theta));
+}
+/*
+float2 transformTexture(float2 uv)
+{
+    uv = 1 - uv;
+
+    uv = (uv - _inputScaleOffset.zw) * _inputScaleOffset.xy;
+    uv -= _margin;
+    uv /= (1- 2*_margin);
+
+    return uv;
+}
+*/
+
+float2 fbm(float2 uv)
+{
+    float2 result = (float2)0;
+    float sum = 0.00001;
+
+    if (_fractalLevels > 0)
+    {
+        result += 0.5 * snoise_grad(float3(uv, _noiseParam.a + _time * _noiseParam.z)).xy;
+        sum += 0.5;
+    }
+
+    if (_fractalLevels > 1)
+    {
+        result += 0.5/2 * snoise_grad(float3(uv, _noiseParam.a + _time * _noiseParam.z)*2).xy;
+        sum += 0.5/2;
+    }
+
+
+    if (_fractalLevels > 2)
+    {
+        result += 0.5/4 * snoise_grad(float3(uv, _noiseParam.a + _time * _noiseParam.z)*4).xy;
+        sum += 0.5/4;
+    }
+
+
+    if (_fractalLevels > 3)
+    {
+        result += 0.5/8 * snoise_grad(float3(uv, _noiseParam.a + _time * _noiseParam.z)*8).xy;
+        sum += 0.5/8;
+    }
+
+
+    if (_fractalLevels > 4)
+    {
+        result += 0.5/16 * snoise_grad(float3(uv, _noiseParam.a + _time * _noiseParam.z)*16).xy;
+        sum += 0.5/16;
+    }
+
+    return result / sum;
+}
+
+void respawn(uint id)
+{
+    float2 oldPos = _particleBuffer[id].position;
+
+   _particleBuffer[id].direction = 3.1415 * 2 * Random(float2(id, _time + 1)).x;
+
+   float2 pos = Random(oldPos + _time);
+
+    pos -= _margin;
+    pos /= (1- 2*_margin);
+
+   _particleBuffer[id].position = pos;
+
+   _particleBuffer[id].age = Random(oldPos + 11).x  * _maxLifetime;
+
+    float2 uv = _particleBuffer[id].position;
+    uv -= _margin;
+    uv /= (1- 2*_margin);
+
+    if (any(uv < 0) || any ( uv > 1))
+    {
+        _particleBuffer[id].color = (float3) 0.0;
+    }
+    else
+    {
+        _particleBuffer[id].color = _Input.SampleLevel(sampler_Input, uv, 0).rgb;
+    }
+}
+
+[numthreads(16,1,1)]
+void Step (uint3 id : SV_DispatchThreadID)
+{
+    float2 dir = _particleBuffer[id.x].direction;
+    float2 pos = _particleBuffer[id.x].position + GetDirection(dir) * (_sensorDist / _fieldDim);
+    // pos = BoundaryConditions(pos);
+    float f = dot(float2(1-_inputAmount, _inputAmount), _Source.SampleLevel(sampler_Source, pos, 0).xy);
+
+    pos = _particleBuffer[id.x].position + GetDirection(dir + _sensorRadians) * (_sensorDist / _fieldDim);
+    // pos = BoundaryConditions(pos);
+    float r = dot(float2(1-_inputAmount, _inputAmount), _Source.SampleLevel(sampler_Source, pos, 0).xy);
+
+    pos = _particleBuffer[id.x].position + GetDirection(dir - _sensorRadians) * (_sensorDist / _fieldDim);
+    // pos = BoundaryConditions(pos);
+    float l = dot(float2(1-_inputAmount, _inputAmount), _Source.SampleLevel(sampler_Source, pos, 0).xy);
+
+    if((f > r) && (f > l)) //Do Nothing
+    {        
+        dir = dir;
+    }
+    else if ((f < l) && (f < r))
+    {
+        //Random
+        dir += randomSign(id.x) * _rotationRadians * _dt;
+    }
+    else if (l < r)
+    {
+        dir += _rotationRadians * _dt;
+    }
+    else if (r < l)
+    {
+        dir -= _rotationRadians * _dt;
+    }
+    
+    _particleBuffer[id.x].direction = dir;
+    
+    if ( _particleBuffer[id.x].direction  != _particleBuffer[id.x].direction )
+        _particleBuffer[id.x].direction  = 0;
+
+    float2 aspect = float2(_fieldDim.x / _fieldDim.y, 1);
+    float actualSpeed = _speed * (1 -  _speedRandom.x * _particleBuffer[id.x].random);
+    pos =_particleBuffer[id.x].position + GetDirection(_particleBuffer[id.x].direction) * _dt * (actualSpeed / _fieldDim);
+    // pos.xy += _dt * _noiseParam.x * fbm(pos * aspect * _noiseParam.y);
+    float noiseForce = _noiseParam.x * (1 - _speedRandom.y * _particleBuffer[id.x].random);
+    pos.xy += _dt * noiseForce * fbm((pos - 0.5) * aspect * _noiseParam.y);
+    float linForce = _linearForce * (1 -  _speedRandom.z * _particleBuffer[id.x].random);
+    pos.xy += _dt * linForce ;
+    float radForce = _radialForce * (1 -  _speedRandom.w * _particleBuffer[id.x].random);
+    pos.xy += _dt * normalize(pos - 0.5 - _radialCenter) * radForce ;
+    pos = BoundaryConditions(pos);
+
+    uint2 px =_fieldDim * pos;
+    _Destination[px] += (float4)_pheremoneAmount;
+    _particleBuffer[id.x].position = pos;   
+    _particleBuffer[id.x].age += _dt;
+
+    if (_particleBuffer[id.x].age > _maxLifetime)
+    {
+        respawn(id.x);
+    }
+}
+
+[numthreads(8,8,1)]
+void RenderField(uint3 id : SV_DispatchThreadID)
+{
+    float2 pos = (float2)id.xy / _screenDim;
+    float level =  _Source.SampleLevel(sampler_Source, pos, 0).x;
+    float4 color = _gradient.SampleLevel(sampler_gradient, float2(level * _renderScale, 0), 0 );
+    _Destination[id.xy] = color;
+}
+
+[numthreads(8,8,1)]
+void RenderLuma(uint3 id : SV_DispatchThreadID)
+{
+    float2 pos = (float2)id.xy / _screenDim;
+    float3 rgb =  _Source.SampleLevel(sampler_Source, pos, 0).xyz;
+    float luma = dot(rgb, float3(0.299, 0.587, 0.114));
+    float4 color = _gradient.SampleLevel(sampler_gradient, float2(luma * _renderScale, 0), 0 );
+    float3 result = _lumaAmount * color.rgb;
+
+    result += ( 1 - _lumaAmount) * rgb;
+    result *= (1 - abs(_lumaAmount - 0.5)) + 0.5;
+    
+    _Destination[id.xy] = float4(result, 1);
+}
+
+[numthreads(8,8,1)]
+void Deposit(uint3 id : SV_DispatchThreadID)
+{
+    float2 pos = (float2)id.xy / _fieldDim;
+
+    pos = pos; // transformTexture(pos);
+    pos -= _margin;
+    pos /= (1- 2*_margin);
+    
+    float4 c = length(_Source.SampleLevel(sampler_Source, pos, 0));
+
+    if ( pos.x < 0 || pos.y < 0 || pos.x > 1 || pos.y > 1)
+        c = (float4)0;
+
+    float4 result = _Destination[id.xy];
+    
+    result.y = c.x * c.a;
+    _Destination[id.xy] = result;
+}
+
+float _pointRadius;
+float _pointAlpha;
+
+// Over = 0,
+// Additive = 1,
+// Screen = 2
+float _blendMode;
+
+float4 Blend(float4 c_old, float4 c_new, float rad)
+{
+    switch(round(_blendMode))
+    {
+        case 0:  // Over
+            return lerp(c_old, c_new, rad);
+        case 1: // Additive
+            return c_old + _pointAlpha * c_new * rad;
+        case 2:  // Screen
+            return (1 - (1 - c_new * rad * _pointAlpha) * (1 - c_old));
+        default : return (float4)0;
+    }
+}
+
+[numthreads(16,1,1)]
+void RenderAgents(uint3 id : SV_DispatchThreadID)
+{
+    uint2 px = _screenDim * _particleBuffer[id.x].position;
+
+    float4 base = _pointColor;
+
+    if (_colorFromTexture > 0)
+    {
+        base = float4(_particleBuffer[id.x].color, 1);
+    }
+
+    for(int dx= -_pointRadius; dx <=_pointRadius; dx++)
+    {
+        for(int dy= -_pointRadius; dy <=_pointRadius; dy++)
+        {
+            float l = saturate(_pointRadius - length(float2(dx, dy)));
+                _Destination[px + int2(dx, dy)]  = Blend( _Destination[px + int2(dx, dy)], base, l);
+        }
+    }
+}
+
+float _brightness;
+float _contrast;
+
+[numthreads(8,8,1)]
+void Post(uint3 id : SV_DispatchThreadID)
+{
+    _Destination[id.xy] = pow(_Source[id.xy] * _brightness, _contrast);
+}

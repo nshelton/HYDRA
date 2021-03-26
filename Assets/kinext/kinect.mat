@@ -61,34 +61,34 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Floats:
     - _BumpScale: 1
-    - _CullDist: 1
-    - _CullThresh: 0.11
+    - _CullDist: 1.36
+    - _CullThresh: 1
     - _Cutoff: 0.5
     - _DetailNormalMapScale: 1
     - _Displacement: 0.3
     - _DstBlend: 0
-    - _EdgeLength: 2
-    - _EmissionAmount: 10
-    - _EmissionPct: 0
-    - _Gloss: 0.2
+    - _EdgeLength: 6.19
+    - _EmissionAmount: 0
+    - _EmissionPct: 0.51
+    - _Gloss: 0.6
     - _GlossMapScale: 1
     - _Glossiness: 0.5
     - _GlossyReflections: 1
     - _Metallic: 0
     - _Mode: 0
-    - _NormalDist: 3.3
+    - _NormalDist: 2.72
     - _OcclusionStrength: 1
     - _Parallax: 0.02
     - _SmoothnessTextureChannel: 0
-    - _Specular: 0.2
+    - _Specular: 0.3
     - _SpecularHighlights: 1
     - _SrcBlend: 1
     - _UVSec: 0
     - _ZWrite: 1
-    - _noiseAmp: 0
-    - _noiseFreq: 0
+    - _noiseAmp: 0.13
+    - _noiseFreq: 8
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
-    - _EmissionColor: {r: 1, g: 0.49019608, b: 0.15686274, a: 1}
-    - _NoiseDir: {r: 0, g: 0, b: -0.14, a: 1}
+    - _EmissionColor: {r: 1, g: 0.3953488, b: 0, a: 1}
+    - _NoiseDir: {r: 0, g: 0, b: -4.47, a: 1}
     - _SpecColor: {r: 0.5, g: 0.5, b: 0.5, a: 0.5}

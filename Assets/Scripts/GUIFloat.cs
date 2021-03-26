@@ -71,8 +71,16 @@ public class GUIFloat : GUIBase
         newVal = Mathf.Pow(newVal, power);
         newVal = Mathf.Lerp(uiMin, uiMax, newVal);
         newVal = min + newVal * (max - min);
-        value = Mathf.Lerp(value, newVal, lerp);
 
+        if (newVal > value)
+        {
+            value = newVal;
+
+        }
+        else
+        {
+            value = Mathf.Lerp(value, newVal, lerp);
+        }
     }
 
     public override void UIUpdate()

@@ -8,10 +8,16 @@ public sealed class feedback : PostProcessEffectSettings
 {
     [Range(0f, 1f), Tooltip("feedback effect intensity.")]
     public FloatParameter Blend = new FloatParameter { value = 0.5f };
+    public FloatParameter Scale = new FloatParameter { value = 0.5f };
 }
 
 public sealed class feedbackRenderer : PostProcessEffectRenderer<feedback>
 {
+    public override DepthTextureMode GetCameraFlags()
+    {
+        return DepthTextureMode.DepthNormals;
+
+    }
 
     private RenderTexture m_feedbackBufferA;
     private RenderTexture m_feedbackBufferB;
@@ -28,6 +34,7 @@ public sealed class feedbackRenderer : PostProcessEffectRenderer<feedback>
 
         sheet.properties.SetTexture("_FeedbackTex", m_feedbackBufferA);
         sheet.properties.SetFloat("_Blend", settings.Blend);
+        sheet.properties.SetFloat("_Scale", settings.Scale);
         context.command.BlitFullscreenTriangle(context.source, m_feedbackBufferB, sheet, 0);
 
         context.command.BlitFullscreenTriangle(m_feedbackBufferB, m_feedbackBufferA);
