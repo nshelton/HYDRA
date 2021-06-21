@@ -1,0 +1,153 @@
+﻿// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel CSMain
+
+#include "./SimplexNoise3D.cginc"
+#include "./Transforms.cginc"
+
+// Particle's data
+struct Particle
+{
+	float3 position;
+	float3 velocity;
+};
+
+RWStructuredBuffer<Particle> particleBuffer;
+
+float Time;
+float MaxAge;
+
+float NumParticles;
+Texture2D<float4> NoiseTex;
+
+float4 WeightsA;
+float4 WeightsB;
+float4 WeightsC;
+float4 WeightsD;
+
+float4 Emitter;
+
+SamplerState _LinearClamp;
+
+float rand(float n){return frac(sin(n) * 43758.5453123);}
+
+
+float3 random3(int id, float3 pos)
+{
+	float2 uv = float2((float) (id % 4096) , (float)id / 4096.0);
+
+	uv /=  float2(4096.0, ceil(NumParticles / 4096.0) );
+
+	uv = frac(uv + Time + (float)id / NumParticles);
+
+	return  NoiseTex.SampleLevel(_LinearClamp, uv, 0).rgb;
+
+}
+
+// float3 TowardsOriginNegativeBias(float3 point)
+// float3 TowardsOrigin2(float3 point)
+// float3 Swap(float3 point)
+// float3 SwapSub(float3 point)
+// float3 Negate(float3 point)
+// float3 NegateSwap(float3 point)
+// float3 Up1(float3 point)
+// float3 Linear(float3 point)
+// float3 Sin(float3 point)
+// float3 Spherical(float3 point)
+// float3 Polar(float3 point)
+// float3 Swirl(float3 point)
+// float3 Normalize(float3 point)
+// float3 Shrink(float3 point)
+
+// float3 F1(float3 p)
+// float3 F2(float3 p)
+// float3 F3(float3 p)
+// float3 F4(float3 p)
+// float3 F5(float3 p)
+
+[numthreads(256, 1, 1)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+	Particle particleData =  particleBuffer[id.x];
+	float3 pos = particleData.position;
+	float life = particleData.velocity.x;
+	float colormap = particleData.velocity.y;
+
+	if ( particleData.velocity.x > MaxAge)
+	{ 
+		life = 0;
+		colormap = 0;
+		float3 size = pow(WeightsD.xyz, (float3)3.0)  * 10.0;
+		pos = size * random3(id, pos) - size /2.0;
+	}
+
+	life += (float)id/ (float)NumParticles;
+
+	float3 pos0 = pos;
+
+	int affineIndex = 0;
+	float maxAffine = WeightsA.x + WeightsA.y + WeightsA.z + WeightsA.a + WeightsB.x + WeightsB.y + WeightsB.z + WeightsB.a;
+
+	float random = rand(Time + (float)id/ (float)NumParticles) * maxAffine;
+
+	if(random < WeightsA.x)
+	{
+		pos = TowardsOriginNegativeBias(pos); 
+	}
+	else if(random <  WeightsA.x + WeightsA.y)
+	{
+		pos = TowardsOrigin2(pos); 
+	}
+	else if(random <  WeightsA.x + WeightsA.y +  WeightsA.z )
+	{
+		pos = Swap(pos); 
+	}
+	else if(random <  WeightsA.x + WeightsA.y +  WeightsA.z + WeightsA.a )
+	{
+		pos = SwapSub(pos); 
+	}
+	else if(random <  WeightsA.x + WeightsA.y +  WeightsA.z + WeightsA.a + WeightsB.x )
+	{
+		pos = Negate(pos);
+	}
+	else if(random <  WeightsA.x + WeightsA.y +  WeightsA.z + WeightsA.a + WeightsB.x + WeightsB.y )
+	{
+		pos = NegateSwap(pos); 
+	}
+	else
+	{
+		pos = Up1(pos); 
+	}
+
+	float maxVariation = WeightsC.x + WeightsC.y + WeightsC.z + WeightsC.a;
+
+	 random = rand(Time + (float)id/ (float)NumParticles) * maxVariation;
+
+	if(random < WeightsC.x)
+	{
+		pos = Sin(pos); 
+	}
+	else if(random < WeightsC.x + WeightsC.y)
+	{
+		pos = Spherical(pos); 
+	}
+	else if(random < WeightsC.x + WeightsC.y + WeightsC.z)
+	{
+		pos = Normalize(pos); 
+	}
+	else if(random < WeightsC.x + WeightsC.y + WeightsC.z + WeightsC.a)
+	{
+		pos = Shrink(pos); 
+	}
+	else 
+	{
+		pos = Swirl(pos); 
+	}
+
+	colormap = length(pos0-pos);
+
+	particleBuffer[id.x].position = pos;
+
+	particleBuffer[id.x].velocity.x = life ;
+	particleBuffer[id.x].velocity.y = colormap ;
+}
+

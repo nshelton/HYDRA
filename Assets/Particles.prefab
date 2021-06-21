@@ -1,0 +1,63 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &8852571662953510826
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8852571662953510828}
+  - component: {fileID: 8852571662953510827}
+  m_Layer: 0
+  m_Name: Particles
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8852571662953510828
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8852571662953510826}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8852571662953510827
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8852571662953510826}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e85c3b5f7fe37224ab46f8f18da22faf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  particleCount: 9000000
+  material: {fileID: 2100000, guid: b286fa66dfd04304895d749fe273cafc, type: 2}
+  computeShader: {fileID: 7200000, guid: b27cb248bdad4d740a1e0e2748901f05, type: 3}
+  m_MaxAge: 4
+  switchDuration: 5
+  m_autoSwitch: 1
+  m_randomRange: {x: 1, y: 1, z: 1, w: 1}
+  m_parameters: {x: 0, y: 0, z: 0, w: 0}
+  m_weightsA: {x: 0, y: 0, z: 0, w: 0}
+  m_weightsB: {x: 0, y: 0, z: 0, w: 0}
+  m_weightsC: {x: 0, y: 0, z: 0, w: 0}
+  m_weightsD: {x: 0, y: 0, z: 0, w: 0}
+  m_weightModulationA: {x: 0, y: 0, z: 0, w: 0}
+  m_weightModulationB: {x: 0, y: 0, z: 0, w: 0}
+  m_weightModulationC: {x: 0, y: 0, z: 0, w: 0}
+  m_weightModulationD: {x: 0, y: 0, z: 0, w: 0}
+  TransitionSpeed: 0.99
+  NextParameters: {x: 0, y: 0, z: 0, w: 0}

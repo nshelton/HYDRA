@@ -242,6 +242,13 @@ public class physarum : MonoBehaviour
         get {return _linearRandom;}
         set {_linearRandom = value;}
     }
+
+    public Vector2 linearForce
+    {
+        get { return _linearForce; }
+        set { _linearForce = value; }
+    }
+
     public float RadialForce 
         {
         get {return _radialForce;}
@@ -411,7 +418,7 @@ public class physarum : MonoBehaviour
         m_fieldShader.SetVector("_fieldDim", new Vector2(m_fieldA.width, m_fieldA.height));
         if ( _screenTex != null)
         {
-            m_fieldShader.SetVector("_screenDim", new Vector2(_screenTex.width, _screenTex.height));
+            m_fieldShader.SetVector("_screenDim", new Vector2(m_fieldA.width, m_fieldA.height));
         }
             m_fieldShader.SetFloat("_blurKernelA", m_fieldBlurKernel.x);
         m_fieldShader.SetFloat("_blurKernelB", m_fieldBlurKernel.y);
@@ -491,8 +498,8 @@ public class physarum : MonoBehaviour
 
         }
 
-        int NumThreadsScreenX =  (Screen.width + 7 ) / 8 ;
-        int NumThreadsScreenY =  (Screen.height + 7 ) / 8 ;
+        int NumThreadsScreenX =  (m_fieldA.width + 7 ) / 8 ;
+        int NumThreadsScreenY =  (m_fieldA.height + 7 ) / 8 ;
 
         if ( _renderField)
         {

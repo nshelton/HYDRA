@@ -278,8 +278,8 @@ void Step (uint3 id : SV_DispatchThreadID)
     // pos.xy += _dt * _noiseParam.x * fbm(pos * aspect * _noiseParam.y);
     float noiseForce = _noiseParam.x * (1 - _speedRandom.y * _particleBuffer[id.x].random);
     pos.xy += _dt * noiseForce * fbm((pos - 0.5) * aspect * _noiseParam.y);
-    float linForce = _linearForce * (1 -  _speedRandom.z * _particleBuffer[id.x].random);
-    pos.xy += _dt * linForce ;
+    float2 linForce = _linearForce * (1 -  _speedRandom.z * _particleBuffer[id.x].random);
+    pos.xy += _dt * linForce;
     float radForce = _radialForce * (1 -  _speedRandom.w * _particleBuffer[id.x].random);
     pos.xy += _dt * normalize(pos - 0.5 - _radialCenter) * radForce ;
     pos = BoundaryConditions(pos);
