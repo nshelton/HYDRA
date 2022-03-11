@@ -50,7 +50,7 @@
         const float amp = 1.0; // self-amplification
         const float sq2 = 0.7; // diagonal weight
         */
-        float2 zoom = normalize(i.globalTexcoord - 0.5) * -0.001 ;
+        float2 zoom = normalize(i.globalTexcoord - 0.5) * -0.002 ;
         float2 vUv = i.globalTexcoord + float2(_dx, _dy) + zoom;
         float2 texel = 1. / float2(_CustomRenderTextureWidth, _CustomRenderTextureHeight);
 
@@ -117,12 +117,12 @@
 
         }*/
    
-        //}
-        fixed4 c = tex2D (_InputTex, vUv)  ;
-
-             a  += c.r * _InputWeight;//vUv.x - 0.5;
-            b  += c.r * _InputWeight;//vUv.y-0.5;
-            div  += c.r * _InputWeight;
+        // //}
+        // fixed4 c = tex2D (_InputTex, vUv)  ;
+        //     float we = saturate(_InputWeight );
+        //      a  += c.r * we;//vUv.x - 0.5;
+        //     b  += c.r * we;//vUv.y-0.5;
+        //     div  += c.r * we;
     
         return clamp(float4(a,b,div,1), -1., 1.);
 

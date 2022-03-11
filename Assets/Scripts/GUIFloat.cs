@@ -91,7 +91,7 @@ public class GUIFloat : GUIBase
 
         if (currentRect.Contains(mouse))
         {
-            if (Input.GetMouseButtonDown(0))
+            if (Input.GetMouseButtonDown(0) && !GUIManager.inEditMode)
             {
                 if (routingType != RoutingType.None)
                 {
@@ -115,7 +115,7 @@ public class GUIFloat : GUIBase
 
                 GUIUtility.ActiveControl = this;
             }
-            if (Input.GetMouseButtonDown(1))
+            if (Input.GetMouseButtonDown(1) || (Input.GetMouseButtonDown(0) && GUIManager.inEditMode))
             {
                 RoutingModal.SetTarget(this);
             }

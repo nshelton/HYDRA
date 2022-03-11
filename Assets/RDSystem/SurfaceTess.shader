@@ -17,6 +17,12 @@
         _Threshold("Threshold", float) = 0.1
         _Fading("Edge Smoothing", float) = 0.2
         _NormalStrength("Normal Strength", Range(0, 1)) = 0.9
+        _Skybox ("Cubemap", Cube) = "" {}
+
+        _ColorParam("colorParam", Vector) = (1,1,1,1)
+        _Palette("_Palette", float) = 1
+        _reflection("_reflection", float) = 1
+
         }
         SubShader {
             Tags { "RenderType"="Opaque" }
@@ -34,34 +40,58 @@
                 float4 tangent : TANGENT;
                 float3 normal : NORMAL;
                 float2 texcoord : TEXCOORD0;
+                
             };
 
             float _Tess;
 
             float4 tessDistance (appdata v0, appdata v1, appdata v2) {
-                float minDist = 1.0;
-                float maxDist = 100.0;
-                return UnityDistanceBasedTess(v0.vertex, v1.vertex, v2.vertex, minDist, maxDist, _Tess);
+         
+                return  _Tess;
             }
 
             float _Displacement;
             sampler2D _MainTex;
             float4 _MainTex_TexelSize;
             float _Twist;
+            float _Palette;
+            float4 _ColorParam;
+            samplerCUBE _Skybox;
 
             float Twist(float2 uv) {
                 float offs = sin(uv.x* 7 + sin(uv.y * 18) + _Time.x);
                 return  _Twist * offs;
             }
+            
+float3 pal(in float t, in float3 a, in float3 b, in float3 c, in float3 d)
+{
+    return a + b * cos(6.28318 * (c * t + d));
+}
+
+float3 palette(float t)
+{
+    t = (t * _ColorParam.x) + _ColorParam.y;
+    float3 color = pal(t, float3(0.5, 0.5, 0.5), float3(0.5, 0.5, 0.5), float3(1.0, 1.0, 1.0), float3(0.0, 0.33, 0.67));
+    if (_Palette > (1.0)) color = pal(t, float3(0.5, 0.5, 0.5), float3(0.5, 0.5, 0.5), float3(1.0, 1.0, 1.0), float3(0.0, 0.10, 0.20));
+    if (_Palette > (2.0)) color = pal(t, float3(0.5, 0.5, 0.5), float3(0.5, 0.5, 0.5), float3(1.0, 1.0, 1.0), float3(0.3, 0.20, 0.20));
+    if (_Palette > (3.0)) color = pal(t, float3(0.5, 0.5, 0.5), float3(0.5, 0.5, 0.5), float3(1.0, 1.0, 0.5), float3(0.8, 0.90, 0.30));
+    if (_Palette > (4.0)) color = pal(t, float3(0.5, 0.5, 0.5), float3(0.5, 0.5, 0.5), float3(1.0, 0.7, 0.4), float3(0.0, 0.15, 0.20));
+    if (_Palette > (5.0)) color = pal(t, float3(0.5, 0.5, 0.5), float3(0.5, 0.5, 0.5), float3(2.0, 1.0, 0.0), float3(0.5, 0.20, 0.25));
+    if (_Palette > (5.0)) color = pal(t, float3(0.5, 0.5, 0.5), float3(0.5, 0.5, 0.5), float3(2.0, 1.0, 0.0), float3(0.5, 0.20, 0.25));
+    if (_Palette > (6.0))
+        color = (float3) 1.0;
+
+    return color;
+}
 
             float FBM(float2 uv)
             {
                 float lod = 1;
              float val = normalize(tex2Dlod(_MainTex, float4(uv, lod,0)).xyz).z * 1;
-              //  val += normalize(tex2Dlod(_MainTex, float4(uv/4, lod, 0)).xyz).z * 4;
-              //  val += normalize(tex2Dlod(_MainTex, float4(uv/2, lod, 0)).xyz).z * 2;
-               // val += normalize(tex2Dlod(_MainTex, float4(uv*2, lod, 0)).xyz).z * 0.5;
-                return   val ;
+            //    val += normalize(tex2Dlod(_MainTex, float4(uv/4, lod, 0)).xyz).z * 4;
+            //    val += normalize(tex2Dlod(_MainTex, float4(uv/2, lod, 0)).xyz).z * 2;
+            //    val += normalize(tex2Dlod(_MainTex, float4(uv*2, lod, 0)).xyz).z * 0.5;
+                return   val;
 
                /*
 
@@ -110,6 +140,7 @@
                 float2 uv_MainTex;
                 float3 viewDir;
                 float3 worldNormal;
+                float3 worldRefl;
                 INTERNAL_DATA 
             };
 
@@ -118,6 +149,7 @@
             half _Metallic0, _Metallic1;
             half _Threshold, _Fading;
             half _NormalStrength;
+            half _reflection;
 
             //void surf (Input IN, inout SurfaceOutput o) {
             void surf(Input IN, inout SurfaceOutputStandard o) {
@@ -131,11 +163,12 @@
                 half v4 = FBM( uv + duv.zy);
 
                 float p = smoothstep(_Threshold - _Fading, _Threshold + _Fading, v0 );
-                o.Albedo =  lerp(_Color0.rgb, _Color1.rgb, p);
+                o.Albedo =  palette(v0);
                 o.Smoothness = lerp(_Smoothness0, _Smoothness1, p);
                 o.Metallic = lerp(_Metallic0, _Metallic1, p);
+                o.Normal = normalize(_Displacement * float3(v1 - v2,  v3 - v4, 1 - _NormalStrength));
+                o.Emission = _reflection * texCUBE (_Skybox, reflect(IN.viewDir, o.Normal));
 
-                o.Normal =  _Displacement * float3(v1 - v2,  v3 - v4, 1 - _NormalStrength);
                // o.Normal +=     getTwistNormal(uv);
                // o.Normal = normalize(o.Normal);
                  

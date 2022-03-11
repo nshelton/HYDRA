@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class GUIManager : MonoBehaviour
 {
-
+    public static bool inEditMode = false;
     public GUISkin m_guiSkin;
     public BaseGUIModule[] m_modules;
     public MacroModule m_macroModule;
@@ -21,9 +21,16 @@ public class GUIManager : MonoBehaviour
 
     public bool m_displayGUI = true;
     public bool m_collapseAll = false;
+    
+    private GUIPresetTrigger editTrigger;
+    private void UpdateEditModeAssigned()
+    {
+        editTrigger.Assigned = inEditMode;
+    }
 
     void Start()
     {
+        Input.simulateMouseWithTouches = true;
         GUIUtility.Init();
         RoutingModal.Init();
 
@@ -34,8 +41,12 @@ public class GUIManager : MonoBehaviour
 
         m_macroModule.Init();
 
-    }
 
+        editTrigger = new GUIPresetTrigger("eDIT",
+        delegate { inEditMode = !true; UpdateEditModeAssigned(); },
+        delegate { });
+
+    }
     private void OnGUI()
     {
         GUIUtility.Opacity = m_opacity;
@@ -46,12 +57,13 @@ public class GUIManager : MonoBehaviour
         // Text color
         GUI.contentColor = Color.black;
         GUI.backgroundColor = Color.clear;
-
+        editTrigger.DrawGUI(new Rect(0, 0, 100, 100));
         if (!m_displayGUI)
             return;
 
         GUI.skin = m_guiSkin;
         Rect activeRect = new Rect(0, 0, MODULEWIDTH, Screen.height - 2 * PADDING);
+
 
         foreach (var module in m_modules)
         {
@@ -87,6 +99,7 @@ public class GUIManager : MonoBehaviour
         {
             RoutingModal.Update();
             RoutingModal.UIUpdate();
+            return;
         }
 
         foreach (var module in m_modules)

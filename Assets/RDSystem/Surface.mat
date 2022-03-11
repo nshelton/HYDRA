@@ -78,13 +78,13 @@ Material:
     - _SpecularHighlights: 1
     - _SrcBlend: 1
     - _Tess: 38
-    - _Threshold: 0.551
+    - _Threshold: 0.1
     - _Twist: 0
     - _UVSec: 0
     - _ZWrite: 1
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
-    - _Color0: {r: 1, g: 1, b: 1, a: 1}
-    - _Color1: {r: 0.9339623, g: 0, b: 0.5294523, a: 1}
+    - _Color0: {r: 1, g: 0.7464502, b: 0, a: 1}
+    - _Color1: {r: 0, g: 1, b: 0.6715336, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.5, g: 0.5, b: 0.5, a: 0.5}

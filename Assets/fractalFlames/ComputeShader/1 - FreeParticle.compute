@@ -14,6 +14,7 @@ struct Particle
 RWStructuredBuffer<Particle> particleBuffer;
 
 float Time;
+float dt;
 float MaxAge;
 
 float NumParticles;
@@ -71,25 +72,25 @@ void CSMain (uint3 id : SV_DispatchThreadID)
 	float3 pos = particleData.position;
 	float life = particleData.velocity.x;
 	float colormap = particleData.velocity.y;
+	float random = rand(Time + id);
 
-	if ( particleData.velocity.x > MaxAge)
+	if ( life > MaxAge)
 	{ 
-		life = 0;
+		life = random * MaxAge/2;
 		colormap = 0;
 		float3 size = pow(WeightsD.xyz, (float3)3.0)  * 10.0;
 		pos = size * random3(id, pos) - size /2.0;
 	}
 
-	life += (float)id/ (float)NumParticles;
+	life += dt;
 
 	float3 pos0 = pos;
 
 	int affineIndex = 0;
 	float maxAffine = WeightsA.x + WeightsA.y + WeightsA.z + WeightsA.a + WeightsB.x + WeightsB.y + WeightsB.z + WeightsB.a;
 
-	float random = rand(Time + (float)id/ (float)NumParticles) * maxAffine;
-
-	if(random < WeightsA.x)
+	float randomIndex = random * maxAffine;
+	if(randomIndex < WeightsA.x)
 	{
 		pos = TowardsOriginNegativeBias(pos); 
 	}

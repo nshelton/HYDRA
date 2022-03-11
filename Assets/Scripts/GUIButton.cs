@@ -95,7 +95,6 @@ public class GUIToggle : GUIBase
 
 public class CustomButton 
 {
-
     public Action actionLeft;
     public Action actionRight;
 

@@ -22,13 +22,13 @@ public class CameraModule : BaseGUIModule
 
     public override void InitInternal()
     {
-        Parameters.Add(new GUIFloat("spout", 0, 1, 1, delegate (float v)
+        Parameters.Add(new GUIFloat("spout", 0, 1, 0, delegate (float v)
         {
             m_spoutRenderer.sharedMaterial.SetColor("_Color", Color.white * v);
             m_spoutRenderer.sharedMaterial.SetColor("_EmissionColor", Color.white * v);
         }));
 
-        Parameters.Add(new GUIFloat("spoutScale", 0, 2, 1, delegate (float v)
+        Parameters.Add(new GUIFloat("spoutScale", 0, 2, 0, delegate (float v)
         {
             m_spoutScale = v;
         }));

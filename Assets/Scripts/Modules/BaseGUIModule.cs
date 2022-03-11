@@ -182,7 +182,7 @@ public abstract class BaseGUIModule : MonoBehaviour
   
         for (int i = 0; i < GUIRows.Count; i++)
         {
-            height += GUIRows[i].Height;
+            height += GUIUtility.BaseHeight;
 
             if (m_hidden && i > 1)
                 break;
@@ -236,7 +236,7 @@ public abstract class BaseGUIModule : MonoBehaviour
                 return;
 
             var row = GUIRows[i];
-            rowRect.height = row.Height;
+            rowRect.height = GUIUtility.BaseHeight;
             row.DrawGUI(rowRect);
             rowRect.y += rowRect.height;
         }

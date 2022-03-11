@@ -21,3 +21,5 @@ Assets/HDRI/the_sky_is_on_fire_8k.hdr
 Assets/HDRI/autoshop_01_8k.hdr
 
 /Builds
+*.MP4
+*.mov

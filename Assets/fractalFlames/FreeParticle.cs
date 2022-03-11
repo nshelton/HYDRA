@@ -232,6 +232,7 @@ public class FreeParticle : MonoBehaviour
     void Update()
     {
         computeShader.SetFloat("Time", Time.time);
+        computeShader.SetFloat("dt", Time.deltaTime);
         computeShader.SetFloat("NumParticles", particleCount);
         computeShader.SetFloat("MaxAge", MaxAge);
 
@@ -258,7 +259,10 @@ public class FreeParticle : MonoBehaviour
 
             //m_parameters = Vector4.Lerp(NextParameters, m_parameters, TransitionSpeed);
 
-            if ( (WeightsA - NextWeightsA).sqrMagnitude < 0.0001f)
+            if ( (WeightsA - NextWeightsA).sqrMagnitude < 0.0001f &&
+                (WeightsB - NextWeightsB).sqrMagnitude < 0.0001f && 
+                (WeightsC - NextWeightsC).sqrMagnitude < 0.0001f &&
+                (WeightsD - NextWeightsD).sqrMagnitude < 0.0001f)
                 isTransition = false;
         }
 
@@ -266,6 +270,10 @@ public class FreeParticle : MonoBehaviour
         {
             Randomize();
             lastSwitchTime = Time.time;
+        }
+        if ( Input.GetKeyDown(KeyCode.M))
+        {
+            Randomize();
         }
 
     }
