@@ -5,7 +5,7 @@ using UnityEngine.Rendering.PostProcessing;
 public class PostModule : BaseGUIModule
 {
 
-    private PostProcessProfile m_profile;
+    [SerializeField] private PostProcessProfile m_profile;
 
     public override string Name() { return "postfx"; }
 
@@ -21,7 +21,8 @@ public class PostModule : BaseGUIModule
                 foreach (var thisVar in cast.GetType().GetFields())
                 {
                     UnityEngine.Rendering.PostProcessing.FloatParameter item = thisVar.GetValue(cast) as UnityEngine.Rendering.PostProcessing.FloatParameter;
-                    if (item != null)
+                    bool edgeDetectHack = !effectName.Equals("EdgeDetect") || thisVar.Name.Equals("edgesOnly");
+                    if (item != null && edgeDetectHack )
                     {
                         var row = new GUIRow();
                         var parameter = new GUIFloat(effectName + "." + thisVar.Name,
@@ -42,10 +43,10 @@ public class PostModule : BaseGUIModule
 
     public override void InitInternal()
     {
-        m_profile = GetComponent<PostProcessVolume>().profile;
         AddParameters<Chroma>(m_profile);
         AddParameters<Mirror>(m_profile);
         AddParameters<vhs>(m_profile);
         AddParameters<feedback>(m_profile);
+        AddParameters<EdgeDetect>(m_profile);
     }
 }

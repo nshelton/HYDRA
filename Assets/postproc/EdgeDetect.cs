@@ -29,7 +29,8 @@ public sealed class EdgeDetect : PostProcessEffectSettings
     public FloatParameter sampleDist = new FloatParameter { value = 1.0f };
     [Range(0, 1)]
     public FloatParameter edgesOnly = new FloatParameter { value = 0.0f };
-    public ColorParameter edgesOnlyBgColor = new ColorParameter { value = Color.white };
+    public ColorParameter edgesOnlyBgColor = new ColorParameter { value = Color.black };
+    public ColorParameter edgesOnlyFgColor = new ColorParameter { value = Color.white };
 }
 
 public sealed class EdgeDetectRenderer : PostProcessEffectRenderer<EdgeDetect>
@@ -59,6 +60,7 @@ public sealed class EdgeDetectRenderer : PostProcessEffectRenderer<EdgeDetect>
         sheet.properties.SetFloat("_BgFade", settings.edgesOnly);
         sheet.properties.SetFloat("_SampleDistance", settings.sampleDist);
         sheet.properties.SetVector("_BgColor", settings.edgesOnlyBgColor.value);
+        sheet.properties.SetVector("_FgColor", settings.edgesOnlyFgColor.value);
         sheet.properties.SetFloat("_Exponent", settings.edgeExp);
         sheet.properties.SetFloat("_Threshold", settings.lumThreshold);
 

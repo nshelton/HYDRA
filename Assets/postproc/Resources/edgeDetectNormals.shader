@@ -26,6 +26,7 @@
 
 		uniform half4 _Sensitivity; 
 		uniform half4 _BgColor;
+		uniform half4 _FgColor;
 		uniform half _BgFade;
 		uniform half _SampleDistance;
 		uniform float _Exponent;
@@ -98,7 +99,7 @@
 			edge *= CheckSame(centerNormal, centerDepth, sample1);
 			edge *= CheckSame(centerNormal, centerDepth, sample2);
 			
-			return edge * lerp(original, _BgColor, _BgFade);
+			return lerp(_FgColor, _BgColor, edge);
 		}
 
 		struct v2flum {
@@ -141,7 +142,7 @@
 			edge *= CheckSame(sample1.xy, DecodeFloatRG(sample1.zw), sample2);
 			edge *= CheckSame(sample3.xy, DecodeFloatRG(sample3.zw), sample4);
 
-			return edge * lerp( SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, i.uv[0]), _BgColor, _BgFade);
+			return  edge * lerp( SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, i.uv[0]), _BgColor, _BgFade);
 		}
 
 		// SOBEL
@@ -281,8 +282,7 @@
 			len = step(len, _Threshold);
 			//if(len >= _Threshold)
 			//	original.rgb = 0;
-
-			return len * lerp(original, _BgColor, _BgFade);			
+			return lerp(original, lerp(_FgColor, _BgColor, len), _BgFade);
 		}
 
     ENDHLSL

@@ -7,6 +7,7 @@ public class MacroModule : BaseGUIModule
 
     [SerializeField] private GUIManager m_manager;
 
+    private int n_Macros = 64;
 
     public class Macro
     {
@@ -61,7 +62,7 @@ public class MacroModule : BaseGUIModule
     {
         m_macros.Clear();
 
-        for(int i = 0; i < 16; i++)
+        for(int i = 0; i < n_Macros; i++)
         {
             string name = i.ToString();
             m_macros[name] = TryLoadMacro(name);
@@ -114,7 +115,7 @@ public class MacroModule : BaseGUIModule
         m_buttonMap[name].Assigned = true;
     }
 
-    public override void InitInternal()
+    public override async void InitInternal()
     {
         m_buttonMap.Clear();
         m_macros.Clear();
@@ -130,9 +131,12 @@ public class MacroModule : BaseGUIModule
 
         LoadMacros();
 
-        for(int i = 0; i < 16; i += 4)
+        for(int i = 0; i < n_Macros; i += 4)
         {
-
+            if ( i%16 == 0){
+                GUIRows.Add(new GUIRow());
+            }
+            
             GUIRow row = new GUIRow();
             row.Height = 100;
 
@@ -146,6 +150,7 @@ public class MacroModule : BaseGUIModule
 
             GUIRows.Add(row);
 
+       
         }
     }
 }

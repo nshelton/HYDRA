@@ -29,7 +29,7 @@ public class LightingModule : BaseGUIModule
     {
         m_camera = Camera.main;
 
-        m_profile = GetComponent<PostProcessVolume>().profile;
+        // m_profile = GetComponent<PostProcessVolume>().profile;
         m_colorGrade = m_profile.GetSetting<ColorGrading>();
         m_ao = m_profile.GetSetting<AmbientOcclusion>();
         m_bloom = m_profile.GetSetting<Bloom>();

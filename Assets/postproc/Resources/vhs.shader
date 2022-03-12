@@ -37,7 +37,10 @@ Shader "Hidden/Custom/vhs"
         uv.y = lerp(uv.y, frac(uv.y + _Jump.x), _Jump.y);
 
           // Jitter
-        float jitter = Hash(float2(py, py), 0) * 2 - 1;
+          float t = floor(_Time.z *10);
+          float blockSize = pow(Hash(t,t), 4)* 50;
+          float yy = floor(py / blockSize );
+        float jitter = Hash(float2(yy, yy), 0) * 2 - 1;
         uv.x += jitter * (_Jitter.x < abs(jitter)) * _Jitter.y;
 
         float4 a = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, uv);
@@ -50,17 +53,17 @@ Shader "Hidden/Custom/vhs"
 
         float4 scanMask = (float4) 0.0;
 
-        px /= 3;
-        py /= 3;
+        // px /= 3;
+        // py /= 3;
 
         int cline = py% 3;
  
         if (cline == 0)
-            scanMask.r = 3;
+            scanMask.r = 1;
         else if (cline == 1)
-            scanMask.g = 3;
+            scanMask.g = 1;
         else if (cline ==2)
-            scanMask.b = 3;
+            scanMask.b = 1;
 
         scanMask = lerp(1, scanMask, _Scanline);
 
