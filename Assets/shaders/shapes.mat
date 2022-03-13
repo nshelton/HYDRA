@@ -65,11 +65,11 @@ Material:
     - _GlossyReflections: 1
     - _Metallic: 0
     - _Mode: 0
-    - _Num: 0
+    - _Num: 6.2010355
     - _OcclusionStrength: 1
-    - _Offset: 0.6994522
+    - _Offset: 0
     - _Parallax: 0.02
-    - _Size: 0.5798841
+    - _Size: 0.1
     - _Size2: -0.38
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1

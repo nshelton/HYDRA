@@ -40,8 +40,10 @@ Shader "Hidden/Custom/vhs"
           float t = floor(_Time.z *10);
           float blockSize = pow(Hash(t,t), 4)* 50;
           float yy = floor(py / blockSize );
-        float jitter = Hash(float2(yy, yy), 0) * 2 - 1;
-        uv.x += jitter * (_Jitter.x < abs(jitter)) * _Jitter.y;
+        float jitter = Hash(yy, yy)  ;
+        if (_Jitter.y > 0.001 && !isnan(jitter)) {
+            uv.x += jitter * (_Jitter.x < abs(jitter)) * (0.1 * _Jitter.y);
+        }
 
         float4 a = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, uv);
 

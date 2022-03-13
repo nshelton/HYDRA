@@ -110,20 +110,41 @@ public class CustomButton
 
     public void Update()
     {
-        Vector2 mouse = Input.mousePosition;
-        mouse.y = Screen.height - mouse.y;
+        if (Input.touchCount > 0) {
+            for(int i = 0; i < Input.touchCount; i ++) {
+                Touch t = Input.GetTouch(i);
+                Vector2 mouse = t.position;
+                mouse.y = Screen.height - mouse.y;
 
-        if (currentRect.Contains(mouse))
-        {
-            if (Input.GetMouseButtonDown(0))
-            {
-                actionLeft();
+                if (currentRect.Contains(mouse) && t.phase == TouchPhase.Began)
+                {
+                    if ( actionRight == null || !GUIManager.inEditMode)
+                    {
+                        actionLeft();
+                    } 
+                    else if (GUIManager.inEditMode)
+                    {
+                        actionRight();
+                    }
+                }
             }
-            if (Input.GetMouseButtonDown(1) && actionRight != null)
+        } else {
+            Vector2 mouse = Input.mousePosition;
+            mouse.y = Screen.height - mouse.y;
+
+            if (currentRect.Contains(mouse))
             {
-                actionRight();
+                if (Input.GetMouseButtonDown(0))
+                {
+                    actionLeft();
+                }
+                if (Input.GetMouseButtonDown(1) && actionRight != null) 
+                {
+                    actionRight();
+                }
             }
         }
+       
     }
 
     public void DrawGUI(Rect area, bool enabled)
@@ -140,7 +161,6 @@ public class CustomButton
         GUI.Label(area, name);
     }
 }
-
 
 public class GUIPresetTrigger : GUITrigger
 {

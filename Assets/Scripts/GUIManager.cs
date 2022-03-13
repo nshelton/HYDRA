@@ -22,11 +22,10 @@ public class GUIManager : MonoBehaviour
     public bool m_displayGUI = true;
     public bool m_collapseAll = false;
     
-    private GUIPresetTrigger editTrigger;
-    private void UpdateEditModeAssigned()
-    {
-        editTrigger.Assigned = inEditMode;
-    }
+    private GUIToggle editTrigger;
+
+    private float m_TimeOffset;
+
 
     void Start()
     {
@@ -41,10 +40,8 @@ public class GUIManager : MonoBehaviour
 
         m_macroModule.Init();
 
-
-        editTrigger = new GUIPresetTrigger("eDIT",
-        delegate { inEditMode = !true; UpdateEditModeAssigned(); },
-        delegate { });
+        editTrigger = new GUIToggle("+=",
+        delegate { GUIManager.inEditMode = true; });
 
     }
     private void OnGUI()
@@ -111,6 +108,8 @@ public class GUIManager : MonoBehaviour
                 module.UIUpdate();
             }
         }
+        GUIManager.inEditMode = false;
+        editTrigger.UIUpdate();
 
         m_macroModule.UIUpdate();
 

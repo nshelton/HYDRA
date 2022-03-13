@@ -31,7 +31,7 @@ public sealed class vhsRenderer : PostProcessEffectRenderer<vhs>
         var jv = settings.Jitter;
         var vjitter = new Vector3(
             Mathf.Max(0, 1.001f - jv * 1.2f),
-            0.002f + jv * jv * jv * 0.05f
+           jv
         );
 
         _jumpTime += delta * settings.Jump * 11.3f;

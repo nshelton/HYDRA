@@ -53,7 +53,6 @@ public static class RoutingModal
 
         rows.Add(row);
 
-
         row = new GUIRow();
 
         m_saw = new GUIToggle("saw", delegate {
@@ -179,7 +178,7 @@ public static class RoutingModal
 
         var rect = GetWindowRect(target.currentRect);
 
-        if (Event.current.button == 0 && !GetWindowRect(rect).Contains(Event.current.mousePosition))
+        if (Event.current.isMouse && Event.current.button == 0 && !GetWindowRect(rect).Contains(Event.current.mousePosition))
         {
             Close();
             return;
@@ -194,7 +193,6 @@ public static class RoutingModal
         rect.height *= normVal;
 
         GUI.DrawTexture(rect, GUIUtility.GreenTexture);
-
 
         rect = GetWindowRect(target.currentRect);
         rect.height = ROW_HEIGHT;
