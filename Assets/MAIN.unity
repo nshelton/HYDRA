@@ -16227,7 +16227,7 @@ Transform:
   m_GameObject: {fileID: 409727235}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 3, y: 3, z: 1}
   m_Children:
   - {fileID: 575369203}
   m_Father: {fileID: 1697106725}
@@ -42567,6 +42567,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1038404891}
   - component: {fileID: 1038404892}
+  - component: {fileID: 1038404893}
   m_Layer: 0
   m_Name: HydraSpout
   m_TagString: Untagged
@@ -42602,6 +42603,24 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _sourceTexture: {fileID: 8400000, guid: 84a3faf3e515e5841aec9c0210d12442, type: 2}
   _alphaSupport: 0
+--- !u!114 &1038404893
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1038404890}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2d98e5bfcdff4847ad69efa861a8e7f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _ndiName: HYDRA
+  _keepAlpha: 0
+  _captureMethod: 2
+  _sourceCamera: {fileID: 0}
+  _sourceTexture: {fileID: 8400000, guid: 84a3faf3e515e5841aec9c0210d12442, type: 2}
+  _resources: {fileID: 11400000, guid: 69304b86950074db7ba8caba75214004, type: 2}
 --- !u!1 &1041421507
 GameObject:
   m_ObjectHideFlags: 0
@@ -58168,13 +58187,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1392559283}
-  m_LocalRotation: {x: -0.01353114, y: 0.9963409, z: -0.08057492, w: 0.025091024}
-  m_LocalPosition: {x: 0, y: -0.5, z: -3.05}
-  m_LocalScale: {x: 5, y: 1, z: 5}
+  m_LocalRotation: {x: -0.37457287, y: -0.25145733, z: -0.65609884, w: -0.60497826}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 0.95, y: 0.61, z: 1.96}
   m_Children: []
   m_Father: {fileID: 1697106725}
   m_RootOrder: 10
-  m_LocalEulerAnglesHint: {x: 9.2, y: 176.97, z: -1.8}
+  m_LocalEulerAnglesHint: {x: 7.08, y: -306.69, z: 98.2}
 --- !u!114 &1392559285
 MonoBehaviour:
   m_ObjectHideFlags: 2
@@ -61979,7 +61998,7 @@ Transform:
   m_GameObject: {fileID: 1472891608}
   m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 3, y: 3, z: 3}
   m_Children: []
   m_Father: {fileID: 1697106725}
   m_RootOrder: 14
@@ -63699,7 +63718,7 @@ Transform:
   m_GameObject: {fileID: 1519799635}
   m_LocalRotation: {x: -0.38268343, y: 0, z: 0, w: 0.92387956}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 2, y: 2, z: 2}
+  m_LocalScale: {x: 6, y: 2, z: 2}
   m_Children: []
   m_Father: {fileID: 1697106725}
   m_RootOrder: 7
@@ -74175,7 +74194,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_fieldShader: {fileID: 7200000, guid: c77280322728b4a4a88a55cb1df0e678, type: 3}
   _resultTexture: {fileID: 8400000, guid: fe0f0750d445d7f48b4fe4802aac615c, type: 2}
-  m_resolution: {x: 2048, y: 2048}
+  m_resolution: {x: 3072, y: 1024}
   m_material: {fileID: 2100000, guid: 2a5ade296bb3a6b41b278106e1e8319c, type: 2}
   m_inputType: 0
   m_inputVideo: {fileID: 8400000, guid: e10eef0df2738174cae1c2f264da7f58, type: 2}
@@ -74283,9 +74302,9 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1759578062}
-  m_LocalRotation: {x: -0, y: 0.028464513, z: -0, w: -0.9995948}
-  m_LocalPosition: {x: 0, y: -1.425, z: 0}
-  m_LocalScale: {x: 2.4760914, y: 2.4760911, z: 2.4760914}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 3, y: 1, z: 1}
   m_Children:
   - {fileID: 711675561}
   m_Father: {fileID: 1697106725}
@@ -82144,13 +82163,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1954000558}
-  m_LocalRotation: {x: -0, y: 0.028464513, z: -0, w: -0.9995948}
-  m_LocalPosition: {x: 0, y: -1.425, z: 0}
-  m_LocalScale: {x: 2.4760911, y: 2.4760911, z: 2.4760911}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1697106725}
   m_RootOrder: 16
-  m_LocalEulerAnglesHint: {x: 0, y: 356.738, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &1954000560
 MeshFilter:
   m_ObjectHideFlags: 0
